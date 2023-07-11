@@ -21,8 +21,8 @@ publishing this is okay.
 
 ### Position Given Control Points
 
-Given a starting point $(a_x, a_y)$, control points $(c_x^{(1)}, c_y^{(1)}),
-(c_x^{(2)}, c_y^{(2)})$ and an endpoint $(b_x, b_y)$, as well as the intersection point of the 
+Given a starting point $(a_x, a_y)$, control points $(c_x^{(1)}, c_y^{(1)})$,
+$(c_x^{(2)}, c_y^{(2)})$ and an endpoint $(b_x, b_y)$, as well as the intersection point of the 
 control handles $(s_x, s_y)$ the position of the Tunni Control point $(t_x, t_y)$ is defined as 
 follows:
 
