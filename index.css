@@ -4,5 +4,6 @@ html, body {
     margin: 0;
 }
 
-circle {
+circle, #tunni-line {
+    cursor: pointer;
 }
