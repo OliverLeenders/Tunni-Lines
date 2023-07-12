@@ -141,30 +141,30 @@ class path {
     update_path(update_tunni) {
         this.p.attr("d", this.path_string());
         // update tunni point
-        if (this.same_side(this.start, this.end, this.C1, this.C2)) {
-            // need to check configuration whether tunni point is "well" defined
-            if ((this.is_left(this.start, this.end, this.C1)
+        if (this.same_side(this.start, this.end, this.C1, this.C2)
+            && ((this.is_left(this.start, this.end, this.C1)
                 != this.is_left(this.start, this.C1, this.C2))
                 && (this.is_left(this.end, this.start, C2)
-                    != this.is_left(this.end, this.C2, this.C1))) {
-                let is = this.intersection(this.start, this.C1, this.C2, this.end);
-                this.is_ui_el
-                    .attr("opacity", 1)
-                    .attr("cx", is.x)
-                    .attr("cy", is.y);
-                if (update_tunni) {
-                    let tunni = this.tunni_location(this.start, this.C1, this.C2, this.end, is);
-                    this.tunni_ui_el
-                        .attr("cx", tunni.x)
-                        .attr("cy", tunni.y)
-                }
-                this.tunni_ui_el.attr("opacity", 1)
-                this.tunni_line.attr("opacity", 1);
+                    != this.is_left(this.end, this.C2, this.C1)))) {
+            let is = this.intersection(this.start, this.C1, this.C2, this.end);
+            this.is_ui_el
+                .attr("opacity", 1)
+                .attr("cx", is.x)
+                .attr("cy", is.y);
+            if (update_tunni) {
+                let tunni = this.tunni_location(this.start, this.C1, this.C2, this.end, is);
+                this.tunni_ui_el
+                    .attr("cx", tunni.x)
+                    .attr("cy", tunni.y)
             }
+            this.tunni_ui_el.attr("opacity", 1)
+            this.tunni_line.attr("opacity", 1);
+
         } else {
             this.is_ui_el.attr("opacity", 0);
             this.tunni_ui_el.attr("opacity", 0);
             this.tunni_line.attr("opacity", 0);
+            this.end_drag_line();
         }
     }
 
