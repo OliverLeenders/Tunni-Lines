@@ -27,6 +27,7 @@ control handles $(s_x, s_y)$ the position of the Tunni Control point $(t_x, t_y)
 follows:
 
 $$t_x = 2 \cdot c_x^{(1)} - a_x + 2 \cdot c_x^{(2)} - b_x - s_x$$
+
 $$t_y = 2 \cdot c_y^{(1)} - a_y + 2 \cdot c_y^{(2)} - b_y - s_y$$
 
 The Tunni Line however is simply a line between the points $c^{(1)}$ and $c^{(2)}$.
@@ -39,14 +40,16 @@ follows:
 
 1. Find the halfway point $h(a)$ between $t$ and $a$, or respectively $h(b)$ with $t$ and $b$.
     $$h_x(a) = \frac{a_x + t_x}{2}, \qquad h_y(a) = \frac{a_y + t_y}{2}$$
+   
     $$h_x(b) = \frac{b_x + t_x}{2}, \qquad h_y(b) = \frac{b_y + t_y}{2}$$
 
-2. Add to $h(a)$ (or $h(b)$) the vector of the second (or first) control point $c^{(2)}$ (or
+3. Add to $h(a)$ (or $h(b)$) the vector of the second (or first) control point $c^{(2)}$ (or
     $c^{(1)}$).
     $$h_x'(a) = h_x(a) + c_x^{(2)} - b_x, \qquad h_y'(a) = h_y(a) + c_y^{(2)} - b_y$$
+   
     $$h_x'(b) = h_x(b) + c_x^{(1)} - a_x, \qquad h_y'(b) = h_y(b) + c_y^{(1)} - a_y$$
 
-3. Compute the intersection between the line $\{h(a), h'(a)\}$ and the line $\{a, c^{(1)}\}$ 
+5. Compute the intersection between the line $\{h(a), h'(a)\}$ and the line $\{a, c^{(1)}\}$ 
     ($\{h(b), h'(b)\}$ and $\{b, c^{(2)}\}$ respectively) and use the resulting points as new 
     coordinates for $c^{(1)}$ (or $c^{(2)}$).
 
