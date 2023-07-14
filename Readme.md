@@ -4,7 +4,8 @@
 _The Tunni lines concept was devised by Eduardo Tunni and Fontlab Ltd., and is used in the FontLab
 font editor._
 
-Many thanks go to the people at FontLab who kindly gave permission to publish this repository.
+Many thanks go to Adam Twardoch and the people at FontLab who kindly gave permission to publish this
+repository.
 
 ### Interactive Demo
 
