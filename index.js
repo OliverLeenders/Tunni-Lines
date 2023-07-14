@@ -5,7 +5,7 @@
 let svg = d3.select("svg");
 
 svg.attr("width", "100%")
-    .attr("height", "100%");
+    .attr("height", "calc(100% - 40px)");
 
 sel_el = false;
 
