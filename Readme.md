@@ -1,10 +1,14 @@
 # Tunni Lines Reverse Engineered
 
-### Credit:
+### Credits:
 _The Tunni lines concept was devised by Eduardo Tunni and Fontlab Ltd., and is used in the FontLab
 font editor._
 
 Many thanks go to the people at FontLab who kindly gave permission to publish this repository.
+
+### Interactive Demo
+
+https://oliverleenders.github.io/Tunni-Lines/
 
 ## Motivation
 
@@ -68,6 +72,8 @@ For the Tunni Point and the Tunni Line to be "well" defined, both handles must l
 of the line $\{a, b\}$. Furthermore, the intersection point of $\{a, c^{(1)}\}$ and $\{b, c^{(2)}\}$
 should also lie on this side of $\{a, b\}$, i.e., the handles should point towards one another, not
 away from each other (behaviour of the Tunni Point is weird when this is not the case).
+
+The Tunni Line can remain visible at all times.
 
 ### Moving the Tunni Line
 
