@@ -57,7 +57,7 @@ class path {
             .attr("cx", this.is_point.x + "px")
             .attr("cy", this.is_point.y + "px")
             .attr("fill", "gray")
-            .attr("r", "2px")
+            .attr("r", "3px")
             .attr("id", "is")
             .attr("opacity", 0);
 
@@ -67,7 +67,7 @@ class path {
             .attr("x2", this.C2.x)
             .attr("y2", this.C2.y)
             .attr("stroke", "steelblue")
-            .attr("stroke-width", "5px")
+            .attr("stroke-width", "3px")
             .attr("opacity", 0)
             .attr("id", "tunni-line");
 
@@ -159,10 +159,15 @@ class path {
                 this.tunni_line.attr("opacity", 1);
             } else {
                 this.tunni_ui_el.attr("opacity", 0);
+                if (sel_el.attr("id") == "tunni") {
+                    this.end_drag_node();
+                }
             }
         } else {
-            this.tunni_line.attr("opacity", 0);
-            this.end_drag_line();
+            this.tunni_ui_el.attr("opacity", 0);
+            if (sel_el.attr("id") == "tunni") {
+                this.end_drag_node();
+            }
         }
     }
 
@@ -299,7 +304,7 @@ class path {
     start_drag_line = (e) => {
         if (sel_el && sel_el.node().tagName == "line") {
             this.tunni_line
-                .attr("stroke-width", "10px");
+                .attr("stroke-width", "5px");
         }
     }
 
@@ -332,7 +337,7 @@ class path {
     end_drag_line = (e) => {
         if (sel_el && sel_el.node().tagName == "line") {
             this.tunni_line
-                .attr("stroke-width", "5px");
+                .attr("stroke-width", "3px");
             sel_el = false;
         }
     }
