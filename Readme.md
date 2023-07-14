@@ -1,5 +1,11 @@
 # Tunni Lines Reverse Engineered
 
+### Credit:
+_The Tunni lines concept was devised by Eduardo Tunni and Fontlab Ltd., and is used in the FontLab
+font editor._
+
+Many thanks go to the people at FontLab who kindly gave permission to publish this repository.
+
 ## Motivation
 
 I have been amazed by the ingenuity and ease of use of FontLab's _Tunni Line_ feature. Using either
@@ -11,11 +17,6 @@ the curve.
 Using the visualizations on the FontLab website, I have reverse engineered the math behind the
 feature and implemented a simple example using `D3.js` (probably overkill for such a simple thing
 but hey).
-
-_I do not in any way intend to infringe FontLab's copyright_; however, this is relatively simple
-2D-geometry and in my opinion anyone with some time on their hands and some experience with the math
-could recreate this just from the material publicly available on their website. Therefore, I suppose
-publishing this is okay.
 
 ## Math
 
@@ -40,17 +41,17 @@ follows:
 
 1. Find the halfway point $h(a)$ between $t$ and $a$, or respectively $h(b)$ with $t$ and $b$.
     $$h_x(a) = \frac{a_x + t_x}{2}, \qquad h_y(a) = \frac{a_y + t_y}{2}$$
-   
+
     $$h_x(b) = \frac{b_x + t_x}{2}, \qquad h_y(b) = \frac{b_y + t_y}{2}$$
 
 3. Add to $h(a)$ (or $h(b)$) the vector of the second (or first) control point $c^{(2)}$ (or
     $c^{(1)}$).
     $$h_x'(a) = h_x(a) + c_x^{(2)} - b_x, \qquad h_y'(a) = h_y(a) + c_y^{(2)} - b_y$$
-   
+
     $$h_x'(b) = h_x(b) + c_x^{(1)} - a_x, \qquad h_y'(b) = h_y(b) + c_y^{(1)} - a_y$$
 
-5. Compute the intersection between the line $\{h(a), h'(a)\}$ and the line $\{a, c^{(1)}\}$ 
-    ($\{h(b), h'(b)\}$ and $\{b, c^{(2)}\}$ respectively) and use the resulting points as new 
+5. Compute the intersection between the line $\{h(a), h'(a)\}$ and the line $\{a, c^{(1)}\}$
+    ($\{h(b), h'(b)\}$ and $\{b, c^{(2)}\}$ respectively) and use the resulting points as new
     coordinates for $c^{(1)}$ (or $c^{(2)}$).
 
 ### Update of the Handles Given Tunni Line and Handle Direction
@@ -66,7 +67,7 @@ $\{a, c^{(1)}\}$ and $\{b, c^{(2)}\}$ to get our new handles.
 For the Tunni Point and the Tunni Line to be "well" defined, both handles must lie on the same side
 of the line $\{a, b\}$. Furthermore, the intersection point of $\{a, c^{(1)}\}$ and $\{b, c^{(2)}\}$
 should also lie on this side of $\{a, b\}$, i.e., the handles should point towards one another, not
-away from each other (behaviour is weird when this is not the case).
+away from each other (behaviour of the Tunni Point is weird when this is not the case).
 
 ### Moving the Tunni Line
 

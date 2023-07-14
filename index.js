@@ -133,7 +133,7 @@ class path {
         this.make_draggable(this.C2_ui_el);
         this.make_draggable(this.tunni_ui_el);
 
-        this.make_draggable_line(this.tunni_line);
+        this.make_draggable(this.tunni_line);
 
         this.update_path(true);
     }
@@ -141,28 +141,26 @@ class path {
     update_path(update_tunni) {
         this.p.attr("d", this.path_string());
         // update tunni point
-        if (this.same_side(this.start, this.end, this.C1, this.C2)
-            && ((this.is_left(this.start, this.end, this.C1)
-                != this.is_left(this.start, this.C1, this.C2))
-                && (this.is_left(this.end, this.start, C2)
-                    != this.is_left(this.end, this.C2, this.C1)))) {
-            let is = this.intersection(this.start, this.C1, this.C2, this.end);
-            this.is_ui_el
-                .attr("opacity", 1)
-                .attr("cx", is.x)
-                .attr("cy", is.y);
-            if (update_tunni) {
-                let tunni = this.tunni_location(this.start, this.C1, this.C2, this.end, is);
-                this.tunni_ui_el
-                    .attr("cx", tunni.x)
-                    .attr("cy", tunni.y)
-            }
-            this.tunni_ui_el.attr("opacity", 1)
-            this.tunni_line.attr("opacity", 1);
+        let is = this.intersection(this.start, this.C1, this.C2, this.end);
 
+        if (this.same_side(this.start, this.end, this.C1, this.C2)) {
+            if (this.same_side(this.start, this.end, this.C1, is)) {
+                this.is_ui_el
+                    .attr("opacity", 1)
+                    .attr("cx", is.x)
+                    .attr("cy", is.y);
+                if (update_tunni) {
+                    let tunni = this.tunni_location(this.start, this.C1, this.C2, this.end, is);
+                    this.tunni_ui_el
+                        .attr("cx", tunni.x)
+                        .attr("cy", tunni.y)
+                }
+                this.tunni_ui_el.attr("opacity", 1)
+                this.tunni_line.attr("opacity", 1);
+            } else {
+                this.tunni_ui_el.attr("opacity", 0);
+            }
         } else {
-            this.is_ui_el.attr("opacity", 0);
-            this.tunni_ui_el.attr("opacity", 0);
             this.tunni_line.attr("opacity", 0);
             this.end_drag_line();
         }
@@ -181,18 +179,36 @@ class path {
 
     make_draggable(ui_el) {
         ui_el.on("mousedown", this.start_drag);
-        ui_el.on("mousemove", this.drag);
-        ui_el.on("mouseup", this.end_drag);
-        ui_el.on("mouseleave", this.end_drag);
+        svg.on("mousemove", this.drag);
+        svg.on("mouseup", this.end_drag);
     }
 
-    start_drag(e) {
+    start_drag = (e) => {
         sel_el = d3.select(e.currentTarget);
-        sel_el.attr("r", "10px")
+        this.start_drag_node(e);
+        this.start_drag_line(e);
     }
 
     drag = (e) => {
-        if (sel_el) {
+        this.drag_node(e);
+        this.drag_line(e);
+    }
+
+    end_drag = (e) => {
+        this.end_drag_node(e);
+        this.end_drag_line(e);
+    }
+
+    start_drag_node = (e) => {
+        if (sel_el && sel_el.node().tagName == "circle") {
+            sel_el.attr("r", "10px")
+        }
+    }
+
+
+
+    drag_node = (e) => {
+        if (sel_el && sel_el.node().tagName == "circle") {
             let upd_tunni = true;
             sel_el.attr("cx", e.x + "px");
             sel_el.attr("cy", e.y + "px");
@@ -273,28 +289,22 @@ class path {
         }
     }
 
-    end_drag(e) {
-        if (sel_el) {
+    end_drag_node = (e) => {
+        if (sel_el && sel_el.node().tagName == "circle") {
             sel_el.attr("r", "5px");
+            sel_el = false;
         }
-        sel_el = false;
-    }
-
-    make_draggable_line(line) {
-        line.on("mousedown", this.start_drag_line);
-        line.on("mousemove", this.drag_line);
-        line.on("mouseup", this.end_drag_line);
-        line.on("mouseleave", this.end_drag_line);
     }
 
     start_drag_line = (e) => {
-        sel_el = d3.select(e.currentTarget);
-        this.tunni_line
-            .attr("stroke-width", "10px");
+        if (sel_el && sel_el.node().tagName == "line") {
+            this.tunni_line
+                .attr("stroke-width", "10px");
+        }
     }
 
     drag_line = (e) => {
-        if (sel_el) {
+        if (sel_el && sel_el.node().tagName == "line") {
             let tl_vector = new point(e.x + this.C2.x - this.C1.x, e.y + this.C2.y - this.C1.y);
             this.C1 = this.intersection(e, tl_vector, this.start, this.C1);
             this.C2 = this.intersection(e, tl_vector, this.end, this.C2);
@@ -320,11 +330,11 @@ class path {
     }
 
     end_drag_line = (e) => {
-        if (sel_el) {
+        if (sel_el && sel_el.node().tagName == "line") {
             this.tunni_line
                 .attr("stroke-width", "5px");
+            sel_el = false;
         }
-        sel_el = false;
     }
 
 
@@ -340,8 +350,6 @@ class path {
             .attr("fill", "red");
     }
 
-
-
     /**
      * @param {point} a
      * @param {point} b
@@ -351,13 +359,31 @@ class path {
     is_left(a, b, c) {
         return Math.sign((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
     }
-
+    /**
+     * Returns whether last two arguments lie on the same side of first two
+     * @param {*} a 
+     * @param {*} b 
+     * @param {*} c 
+     * @param {*} d 
+     * @returns 
+     */
     same_side(a, b, c, d) {
         return this.is_left(a, b, c) == this.is_left(a, b, d);
     }
 
+    /**
+     *
+     * @param {point} a
+     * @param {point} b
+     * @param {point} c
+     * @param {point} d
+     * @returns
+     */
     intersection(a, b, c, d) {
         let denominator = ((d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y))
+        if (denominator == 0) {
+            return new point(d.x, d.y);
+        }
         let scale_x = ((d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x)) / denominator;
         let x_coord = a.x + scale_x * (b.x - a.x);
         let y_coord = a.y + scale_x * (b.y - a.y);
