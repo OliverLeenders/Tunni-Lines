@@ -127,6 +127,8 @@ class path {
             .attr("id", "tunni")
             .attr("opacity", 0);
 
+        this.tunni_ui_el.on("dblclick", this.balance)
+
         this.make_draggable(this.start_ui_el);
         this.make_draggable(this.end_ui_el);
         this.make_draggable(this.C1_ui_el);
@@ -169,6 +171,44 @@ class path {
                 this.end_drag_node();
             }
         }
+    }
+
+    balance = () => {
+        console.log("balance")
+        let is = this.intersection(this.start, this.C1, this.C2, this.end);
+        let C1_scale = (Math.sqrt((this.C1.x - this.start.x) ** 2 + (this.C1.y - this.start.y) ** 2))
+            / (Math.sqrt((is.x - this.start.x) ** 2 + (is.y - this.start.y) ** 2));
+
+        let C2_scale = (Math.sqrt((this.C2.x - this.end.x) ** 2 + (this.C2.y - this.end.y) ** 2))
+            / (Math.sqrt((is.x - this.end.x) ** 2 + (is.y - this.end.y) ** 2));
+
+
+        let avg = (C1_scale + C2_scale) / 2;
+
+        this.C1.x = this.start.x + avg * (is.x - this.start.x);
+        this.C1.y = this.start.y + avg * (is.y - this.start.y);
+        this.C2.x = this.end.x + avg * (is.x - this.end.x);
+        this.C2.y = this.end.y + avg * (is.y - this.end.y);
+
+        this.C1_ui_el
+            .attr("cx", this.C1.x)
+            .attr("cy", this.C1.y);
+        this.C1_line
+            .attr("x2", this.C1.x)
+            .attr("y2", this.C1.y);
+
+        this.C2_ui_el
+            .attr("cx", this.C2.x)
+            .attr("cy", this.C2.y);
+        this.C2_line
+            .attr("x2", this.C2.x)
+            .attr("y2", this.C2.y);
+        this.tunni_line
+            .attr("x1", this.C1.x)
+            .attr("y1", this.C1.y)
+            .attr("x2", this.C2.x)
+            .attr("y2", this.C2.y)
+        this.update_path(true);
     }
 
     /**
@@ -252,8 +292,8 @@ class path {
                 this.tunni_point.x = e.x;
                 this.tunni_point.y = e.y;
 
-                let C1_halfway_point = new point((e.x + this.start.x) / 2,
-                    (e.y + this.start.y) / 2);
+                let C1_halfway_point = new point((this.tunni_point.x + this.start.x) / 2,
+                    (this.tunni_point.y + this.start.y) / 2);
                 let C2_vector = new point(this.C2.x - this.end.x + C1_halfway_point.x,
                     this.C2.y - this.end.y + C1_halfway_point.y);
                 let C1_intersection = this.intersection(C1_halfway_point, C2_vector,
@@ -269,7 +309,8 @@ class path {
                     .attr("x2", this.C1.x)
                     .attr("y2", this.C1.y);
 
-                let C2_halfway_point = new point((e.x + this.end.x) / 2, (e.y + this.end.y) / 2);
+                let C2_halfway_point = new point((this.tunni_point.x + this.end.x) / 2,
+                    (this.tunni_point.y + this.end.y) / 2);
                 let C1_vector = new point(this.C1.x - this.start.x + C2_halfway_point.x,
                     this.C1.y - this.start.y + C2_halfway_point.y);
                 let C2_intersection = this.intersection(C2_halfway_point,
