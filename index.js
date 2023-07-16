@@ -174,7 +174,6 @@ class path {
     }
 
     balance = () => {
-        console.log("balance")
         let is = this.intersection(this.start, this.C1, this.C2, this.end);
         let C1_scale = (Math.sqrt((this.C1.x - this.start.x) ** 2 + (this.C1.y - this.start.y) ** 2))
             / (Math.sqrt((is.x - this.start.x) ** 2 + (is.y - this.start.y) ** 2));
