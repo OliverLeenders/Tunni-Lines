@@ -75,7 +75,7 @@ follows:
     $$\lambda^{(2)} = \frac{\sqrt{\left(c_x^{(2)} - b_x\right)^2 + \left(c_y^{(2)} - b_y\right)^2}}{\sqrt{\left(s_x - b_x\right)^2 + \left(s_y - b_y\right)^2}}$$
 2. Take the average of both scale factors.
     $$\lambda^* = \frac{\lambda^{(1)} + \lambda^{(2)}}{2}$$
-3. Rescale the handles using $\lambda^{*}$.
+3. Rescale the handles using $\lambda^*$.
     $$c_x^{(1)} = a_x + \lambda^* \cdot \left(s_x - a_x\right) \qquad c_y^{(1)} = a_y + \lambda^* \cdot \left(s_y - a_y\right)$$
     $$c_x^{(2)} = b_x + \lambda^* \cdot \left(s_x - b_x\right) \qquad c_y^{(2)} = b_y + \lambda^* \cdot \left(s_y - b_y\right)$$
 
