@@ -55,24 +55,39 @@ follows:
 
     $$h_x'(b) = h_x(b) + c_x^{(1)} - a_x, \qquad h_y'(b) = h_y(b) + c_y^{(1)} - a_y$$
 
-5. Compute the intersection between the line $\{h(a), h'(a)\}$ and the line $\{a, c^{(1)}\}$
-    ($\{h(b), h'(b)\}$ and $\{b, c^{(2)}\}$ respectively) and use the resulting points as new
+5. Compute the intersection between the line $\overline{h(a)h'(a)}$ and the line $\overline{ac^{(1)}}$
+    ($\overline{h(b)h'(b)}$ and $\overline{bc^{(2)}}$ respectively) and use the resulting points as new
     coordinates for $c^{(1)}$ (or $c^{(2)}$).
 
 ### Update of the Handles Given Tunni Line and Handle Direction
 
 Let $\ell$ be some point on the Tunni Line. Note: When the tunni line is moved, its direction does
-not change. Therefore, we can intersect the line $\{\ell, \ell + c^{(1)} - c^{(2)}\}$ with the lines
-$\{a, c^{(1)}\}$ and $\{b, c^{(2)}\}$ to get our new handles.
+not change. Therefore, we can intersect the line $\overline{\ell(\ell + c^{(1)} - c^{(2)})}$ with the lines
+$\overline{ac^{(1)}}$ and $\overline{bc^{(2)}}$ to get our new handles.
+
+### Balance Handles
+
+In FontLab, it is possible to double click to balance out the bezier curve. This can be achieved as
+follows:
+
+1. Compute the scale factors for both the control handles:
+    $$\lambda^{(1)} = \frac{\sqrt{\left(c_x^{(1)} - a_x\right)^2 + \left(c_y^{(1)} - a_y\right)^2}}{\sqrt{\left(s_x - a_x\right)^2 + \left(s_y - a_y\right)^2}}$$
+    $$\lambda^{(2)} = \frac{\sqrt{\left(c_x^{(2)} - b_x\right)^2 + \left(c_y^{(2)} - b_y\right)^2}}{\sqrt{\left(s_x - b_x\right)^2 + \left(s_y - b_y\right)^2}}$$
+2. Take the average of both scale factors.
+    $$\lambda^* = \frac{\lambda^{(1)} + \lambda^{(2)}}{2}$$
+3. Rescale the handles using $\lambda^{*}$
+    $$c_x^{(1)} = a_x + \lambda^* \cdot \left(s_x - a_x\right) \qquad c_y^{(1)} = a_y + \lambda^* \cdot \left(s_y - a_y\right)$$
+    $$c_x^{(2)} = b_x + \lambda^* \cdot \left(s_x - b_x\right) \qquad c_y^{(2)} = b_y + \lambda^* \cdot \left(s_y - b_y\right)$$
 
 ## Constraints
 
 ### When is the Tunni Point Useful
 
-For the Tunni Point and the Tunni Line to be "well" defined, both handles must lie on the same side
-of the line $\{a, b\}$. Furthermore, the intersection point of $\{a, c^{(1)}\}$ and $\{b, c^{(2)}\}$
-should also lie on this side of $\{a, b\}$, i.e., the handles should point towards one another, not
-away from each other (behaviour of the Tunni Point is weird when this is not the case).
+For the Tunni Point to be "well" defined, both handles must lie on the same side of the line
+$\overline{ab}$. Furthermore, the intersection point of $\overline{ac^{(1)}}$ and
+$\overline{bc^{(2)}}$ should also lie on this side of $\overline{ab}$, i.e., the handles should
+point towards one another, not away from each other (behaviour of the Tunni Point is weird when this
+is not the case).
 
 The Tunni Line can remain visible at all times.
 
