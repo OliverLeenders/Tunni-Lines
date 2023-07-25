@@ -25,7 +25,7 @@ but hey).
 
 ## Math
 
-### Position Given Control Points
+### Tunni Point
 
 Given a starting point $(a_x, a_y)$, control points $(c_x^{(1)}, c_y^{(1)})$,
 $(c_x^{(2)}, c_y^{(2)})$ and an endpoint $(b_x, b_y)$, as well as the intersection point of the
@@ -35,6 +35,8 @@ follows:
 $$t_x = 2 \cdot c_x^{(1)} - a_x + 2 \cdot c_x^{(2)} - b_x - s_x$$
 
 $$t_y = 2 \cdot c_y^{(1)} - a_y + 2 \cdot c_y^{(2)} - b_y - s_y$$
+
+### Tunni Line
 
 The Tunni Line however is simply a line between the points $c^{(1)}$ and $c^{(2)}$.
 
@@ -56,19 +58,18 @@ follows:
     $$h_x'(b) = h_x(b) + c_x^{(1)} - a_x, \qquad h_y'(b) = h_y(b) + c_y^{(1)} - a_y$$
 
 5. Compute the intersection between the line $\overline{h(a)h'(a)}$ and the line $\overline{ac^{(1)}}$
-    ($\overline{h(b)h'(b)}$ and $\overline{bc^{(2)}}$ respectively) and use the resulting points as new
-    coordinates for $c^{(1)}$ (or $c^{(2)}$).
+    ($\overline{h(b)h'(b)}$ and $\overline{bc^{(2)}}$ respectively) and use the resulting points as new coordinates for $c^{(1)}$ (or $c^{(2)}$).
 
 ### Update of the Handles Given Tunni Line and Handle Direction
 
 Let $\ell$ be some point on the Tunni Line. Note: When the tunni line is moved, its direction does
-not change. Therefore, we can intersect the line $\overline{\ell(\ell + c^{(1)} - c^{(2)})}$ with the lines
-$\overline{ac^{(1)}}$ and $\overline{bc^{(2)}}$ to get our new handles.
+not change. Therefore, we can intersect the line $\overline{\ell(\ell + c^{(1)} - c^{(2)})}$ with 
+the lines $\overline{ac^{(1)}}$ and $\overline{bc^{(2)}}$ to get our new handles.
 
 ### Balance Handles
 
-In FontLab, it is possible to double click to balance out the bezier curve. This can be achieved as
-follows:
+In FontLab, it is possible to double click the Tunni Point to balance out the bezier curve. This can
+be achieved as follows:
 
 1. Compute the scale factors for both the control handles:
     $$\lambda^{(1)} = \frac{\sqrt{\left(c_x^{(1)} - a_x\right)^2 + \left(c_y^{(1)} - a_y\right)^2}}{\sqrt{\left(s_x - a_x\right)^2 + \left(s_y - a_y\right)^2}}$$
@@ -78,6 +79,8 @@ follows:
 3. Rescale the handles using $\lambda^{\ast}$.
     $$c_x^{(1)} = a_x + \lambda^* \cdot \left(s_x - a_x\right) \qquad c_y^{(1)} = a_y + \lambda^* \cdot \left(s_y - a_y\right)$$
     $$c_x^{(2)} = b_x + \lambda^* \cdot \left(s_x - b_x\right) \qquad c_y^{(2)} = b_y + \lambda^* \cdot \left(s_y - b_y\right)$$
+
+This "balance"-operation is different from other balancing operations beause it does not necessarily ensure a smooth curve but just states that the tunni Line should be parralel to the line $\overline{ab}$.
 
 ## Constraints
 
