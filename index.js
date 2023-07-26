@@ -298,8 +298,7 @@ class path {
                         this.upd_SVG_circle(this.tunni_ui_els[i + 1], next_tunni);
                     }
                 }
-                this.tunni_ui_els[i].attr("opacity", 1)
-                this.tunni_lines[i].attr("opacity", 1);
+                this.tunni_ui_els[i].attr("opacity", 1);
             } else {
                 this.tunni_ui_els[i].attr("opacity", 0);
                 if (sel_el.attr("id") == "tunni") {
@@ -512,7 +511,7 @@ class path {
     drag_line = (e) => {
         let e_point = new point(e.x, e.y);
         if (sel_el && sel_el.node().tagName == "line") {
-            let i = sel_el.attr("spline_nr")
+            let i = parseInt(sel_el.attr("spline_nr"));
             let bezier = this.splines[i];
             let tl_vector = point.sub(point.add(e_point, bezier.C2), bezier.C1);
             bezier.C1 = this.intersection(e, tl_vector, bezier.start, bezier.C1);
