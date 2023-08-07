@@ -5,7 +5,9 @@
 let svg = d3.select("svg");
 
 svg.attr("width", "100%")
-    .attr("height", "calc(100% - 40px)");
+    .attr("height", "calc(100% - 54px)"); 
+    // 100% - footer-height
+    // somewhere there are 4 px lost miraculously
 
 sel_el = false;
 
@@ -34,8 +36,8 @@ class point {
 
     /**
      * Subtract two points / vectors
-     * @param {point} p1 
-     * @param {point} p2 
+     * @param {point} p1
+     * @param {point} p2
      */
     static sub = (p1, p2) => {
         return new point(p1.x - p2.x, p1.y - p2.y);
@@ -43,9 +45,9 @@ class point {
 
     /**
      * Multiplies a point / vector with a number
-     * @param {point} p 
-     * @param {number} c 
-     * @returns 
+     * @param {point} p
+     * @param {number} c
+     * @returns
      */
     static mult = (p, c) => {
         return new point(p.x * c, p.y * c);
@@ -53,8 +55,8 @@ class point {
 
     /**
      * Divide coordinates of point by number
-     * @param {point} p 
-     * @param {Number} c 
+     * @param {point} p
+     * @param {Number} c
      */
     static div = (p, c) => {
         if (c == 0) {
@@ -222,18 +224,6 @@ class path {
             .attr("r", "5px")
             .attr("id", "C2"));
 
-        // the start node should only be drawn for the first path and is the end node of the
-        // previous path in all other cases
-        if (i == 0) {
-            this.start_ui_el = this.start_group.append("circle")
-                .attr("cx", curr.start.x + "px")
-                .attr("cy", curr.start.y + "px")
-                .attr("spline_nr", i)
-                .attr("fill", "steelblue")
-                .attr("r", "5px")
-                .attr("id", "start");
-        }
-
         this.end_ui_els.push(this.end_group.append("circle")
             .attr("cx", curr.end.x + "px")
             .attr("cy", curr.end.y + "px")
@@ -257,15 +247,23 @@ class path {
                 e.cancelBubble = true;
             }));
 
-        if (i == 0) {
-            this.make_draggable(this.start_ui_el);
-        }
         this.make_draggable(this.end_ui_els[i]);
         this.make_draggable(this.C1_ui_els[i]);
         this.make_draggable(this.C2_ui_els[i]);
         this.make_draggable(this.tunni_ui_els[i]);
-
         this.make_draggable(this.tunni_lines[i]);
+    }
+
+    add_start_ui() {
+        this.start_ui_el = this.start_group.append("circle")
+            .attr("cx", this.start.x + "px")
+            .attr("cy", this.start.y + "px")
+            .attr("spline_nr", 0)
+            .attr("fill", "steelblue")
+            .attr("r", "5px")
+            .attr("id", "start");
+
+        this.make_draggable(this.start_ui_el);
     }
 
     /**
@@ -334,10 +332,12 @@ class path {
             let c2 = new point(start_p.x + 0.67 * (p.x - start_p.x), start_p.y + 0.67 * (p.y - start_p.y));
             this.splines.push(new bezier(start_p, c1, c2, p));
             this.add_ui_control(this.splines.length - 1);
+
             this.update_path(true, this.splines.length - 1);
         } else {
             console.log("here");
             this.start = p;
+            this.add_start_ui();
         }
     }
 
