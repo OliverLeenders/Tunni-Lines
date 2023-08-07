@@ -119,9 +119,9 @@ class path {
      * @param {point} C2 control point two
      * @param {point} end end-point
      */
-    constructor(start, C1, C2, end) {
+    constructor() {
+        this.closed = false;
         this.splines = [];
-        this.splines.push(new bezier(start, C1, C2, end));
         this.p = svg.append("path")
             .attr("stroke", "black")
             .attr("fill", "transparent");
@@ -145,7 +145,8 @@ class path {
         this.C2_ui_els = [];
         this.C2_group = this.ui.append("g").attr("id", "C2");
 
-        this.start_ui_els = [];
+        this.start;
+        this.start_ui_el;
         this.start_group = this.ui.append("g").attr("id", "start");
 
         this.end_ui_els = [];
@@ -157,7 +158,7 @@ class path {
         for (let i = 0; i < this.splines.length; i++) {
             this.add_ui_control(i);
         }
-        this.update_path(true, 0);
+        // this.update_path(true, 0);
     }
 
     /**
@@ -166,6 +167,7 @@ class path {
      */
     add_ui_control(i) {
         let curr = this.splines[i];
+        console.log(curr);
         this.is_ui_els.push(this.is_group.append("circle")
             .attr("cx", curr.is_point.x + "px")
             .attr("cy", curr.is_point.y + "px")
@@ -223,14 +225,15 @@ class path {
         // the start node should only be drawn for the first path and is the end node of the
         // previous path in all other cases
         if (i == 0) {
-            this.start_ui_els.push(this.start_group.append("circle")
+            this.start_ui_el = this.start_group.append("circle")
                 .attr("cx", curr.start.x + "px")
                 .attr("cy", curr.start.y + "px")
                 .attr("spline_nr", i)
                 .attr("fill", "steelblue")
                 .attr("r", "5px")
-                .attr("id", "start"));
+                .attr("id", "start");
         }
+
         this.end_ui_els.push(this.end_group.append("circle")
             .attr("cx", curr.end.x + "px")
             .attr("cy", curr.end.y + "px")
@@ -254,7 +257,9 @@ class path {
                 e.cancelBubble = true;
             }));
 
-        this.make_draggable(this.start_ui_els[0]);
+        if (i == 0) {
+            this.make_draggable(this.start_ui_el);
+        }
         this.make_draggable(this.end_ui_els[i]);
         this.make_draggable(this.C1_ui_els[i]);
         this.make_draggable(this.C2_ui_els[i]);
@@ -318,12 +323,22 @@ class path {
      * @param {point} p new endpoint
      */
     add_spline = (p) => {
-        let start = this.splines[this.splines.length - 1].end;
-        let c1 = new point(start.x + 0.33 * (p.x - start.x), start.y + 0.33 * (p.y - start.y));
-        let c2 = new point(start.x + 0.67 * (p.x - start.x), start.y + 0.67 * (p.y - start.y));
-        this.splines.push(new bezier(start, c1, c2, p));
-        this.add_ui_control(this.splines.length - 1);
-        this.update_path(true, this.splines.length - 1);
+        if (this.start != undefined) {
+            let start_p;
+            if (this.splines.length >= 1) {
+                start_p = this.splines[this.splines.length - 1].end;
+            } else {
+                start_p = this.start;
+            }
+            let c1 = new point(start_p.x + 0.33 * (p.x - start_p.x), start_p.y + 0.33 * (p.y - start_p.y));
+            let c2 = new point(start_p.x + 0.67 * (p.x - start_p.x), start_p.y + 0.67 * (p.y - start_p.y));
+            this.splines.push(new bezier(start_p, c1, c2, p));
+            this.add_ui_control(this.splines.length - 1);
+            this.update_path(true, this.splines.length - 1);
+        } else {
+            console.log("here");
+            this.start = p;
+        }
     }
 
     /**
@@ -331,6 +346,9 @@ class path {
      * @returns string representing the spline
      */
     spline_string = () => {
+        if (this.splines.length == 0) {
+            return "";
+        }
         let str = this.splines[0].to_string();
         for (let i = 1; i < this.splines.length; i++) {
             str += " " + this.splines[i].suffix_string();
@@ -411,8 +429,6 @@ class path {
     drag_node = (e) => {
         if (sel_el && sel_el.node().tagName == "circle") {
             let upd_tunni = true;
-            sel_el.attr("cx", e.x + "px");
-            sel_el.attr("cy", e.y + "px");
             let i = parseInt(sel_el.attr("spline_nr"));
             let bezier = this.splines[i];
             let C1_line = this.C1_lines[i];
@@ -423,6 +439,7 @@ class path {
             let next_bezier = this.splines[i + 1];
             let e_point = new point(e.x, e.y);
 
+            this.upd_SVG_circle(sel_el, e_point);
 
             if (sel_el.attr("id") == "start") {
                 let delta = point.sub(bezier.C1, bezier.start);
@@ -634,7 +651,7 @@ let C1 = new point(250, 100);
 let C2 = new point(400, 250);
 let Y = new point(400, 400);
 
-let spline1 = new path(X, C1, C2, Y);
+let spline1 = new path();
 
 svg.on("dblclick", (e) => {
     let x = e.x;
