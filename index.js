@@ -5,9 +5,9 @@
 let svg = d3.select("svg");
 
 svg.attr("width", "100%")
-    .attr("height", "calc(100% - 54px)"); 
-    // 100% - footer-height
-    // somewhere there are 4 px lost miraculously
+    .attr("height", "calc(100% - 54px)");
+// 100% - footer-height
+// somewhere there are 4 px lost miraculously
 
 sel_el = false;
 
@@ -88,11 +88,29 @@ class bezier {
      * @param {point} end end-point
      */
     constructor(start, C1, C2, end) {
+        /**
+         * @type{point}
+         */
         this.start = start;
+        /**
+         * @type{point}
+         */
         this.C1 = C1;
+        /**
+         * @type{point}
+         */
         this.C2 = C2;
+        /**
+         * @type{point}
+         */
         this.end = end;
+        /**
+         * @type{point}
+         */
         this.is_point = new point(0, 0);
+        /**
+         * @type{point}
+         */
         this.tunni_point = new point(0, 0);
     }
 
@@ -113,6 +131,11 @@ class bezier {
     }
 }
 
+//================================================================================================//
+// class representing a SVG path element with ui-controls.
+//================================================================================================//
+
+
 class path {
     /**
      * Constructs a new cubic bezier spline from 4 points
@@ -123,6 +146,9 @@ class path {
      */
     constructor() {
         this.closed = false;
+        /**
+         * @type{bezier[]}
+         */
         this.splines = [];
         this.p = svg.append("path")
             .attr("stroke", "black")
@@ -163,13 +189,16 @@ class path {
         // this.update_path(true, 0);
     }
 
+    close_path = () => {
+        this.closed = true;
+    }
+
     /**
      * Add ui control points for a given spline
      * @param {Number} i spline number
      */
     add_ui_control(i) {
         let curr = this.splines[i];
-        console.log(curr);
         this.is_ui_els.push(this.is_group.append("circle")
             .attr("cx", curr.is_point.x + "px")
             .attr("cy", curr.is_point.y + "px")
@@ -224,14 +253,15 @@ class path {
             .attr("r", "5px")
             .attr("id", "C2"));
 
-        this.end_ui_els.push(this.end_group.append("circle")
-            .attr("cx", curr.end.x + "px")
-            .attr("cy", curr.end.y + "px")
-            .attr("spline_nr", i)
-            .attr("fill", "steelblue")
-            .attr("r", "5px")
-            .attr("id", "end"));
-
+        if (!this.closed) {
+            this.end_ui_els.push(this.end_group.append("circle")
+                .attr("cx", curr.end.x + "px")
+                .attr("cy", curr.end.y + "px")
+                .attr("spline_nr", i)
+                .attr("fill", "steelblue")
+                .attr("r", "5px")
+                .attr("id", "end"));
+        }
         // tunni point
         this.tunni_ui_els.push(this.tunni_group.append("circle")
             .attr("cx", curr.tunni_point.x + "px")
@@ -247,7 +277,9 @@ class path {
                 e.cancelBubble = true;
             }));
 
-        this.make_draggable(this.end_ui_els[i]);
+        if (!this.closed) {
+            this.make_draggable(this.end_ui_els[i]);
+        }
         this.make_draggable(this.C1_ui_els[i]);
         this.make_draggable(this.C2_ui_els[i]);
         this.make_draggable(this.tunni_ui_els[i]);
@@ -262,6 +294,10 @@ class path {
             .attr("fill", "steelblue")
             .attr("r", "5px")
             .attr("id", "start");
+        this.start_ui_el.on("dblclick", (e) => {
+            e.cancelBubble = true;
+            this.add_spline(this.start);
+        })
 
         this.make_draggable(this.start_ui_el);
     }
@@ -314,10 +350,18 @@ class path {
                 this.end_drag_node();
             }
         }
+
+        if (this.distance_line_to_point(bezier.start, bezier.end, bezier.C1) < 7
+            && this.distance_line_to_point(bezier.start, bezier.end, bezier.C2) < 7) {
+            this.tunni_lines[i].attr("opacity", 0);
+        } else {
+            this.tunni_lines[i].attr("opacity", 1);
+        }
     }
 
     /**
-     * Adds a bezier to the point from the endpoint of the last spline
+     * Adds a bezier to the point from the endpoint of the last spline. If the new point is equal to
+     * the start point (point to same object) the path is closed.
      * @param {point} p new endpoint
      */
     add_spline = (p) => {
@@ -331,11 +375,12 @@ class path {
             let c1 = new point(start_p.x + 0.33 * (p.x - start_p.x), start_p.y + 0.33 * (p.y - start_p.y));
             let c2 = new point(start_p.x + 0.67 * (p.x - start_p.x), start_p.y + 0.67 * (p.y - start_p.y));
             this.splines.push(new bezier(start_p, c1, c2, p));
+            if (p == this.start) {
+                this.close_path();
+            }
             this.add_ui_control(this.splines.length - 1);
-
             this.update_path(true, this.splines.length - 1);
         } else {
-            console.log("here");
             this.start = p;
             this.add_start_ui();
         }
@@ -352,6 +397,9 @@ class path {
         let str = this.splines[0].to_string();
         for (let i = 1; i < this.splines.length; i++) {
             str += " " + this.splines[i].suffix_string();
+        }
+        if (this.closed) {
+            str += " Z";
         }
         return str;
     }
@@ -443,12 +491,27 @@ class path {
 
             if (sel_el.attr("id") == "start") {
                 let delta = point.sub(bezier.C1, bezier.start);
+                let delta_2, last_index, last_bezier;
+                if (this.closed) {
+                    last_index = this.splines.length - 1;
+                    last_bezier = this.splines[last_index];
+                    delta_2 = point.sub(last_bezier.C2, last_bezier.end);
+                }
                 bezier.start = e_point;
+                this.start = e_point;
                 bezier.C1 = point.add(bezier.start, delta);
 
                 this.upd_SVG_line(C1_line, e_point, bezier.C1);
                 this.upd_SVG_circle(C1_ui_el, bezier.C1);
                 this.upd_SVG_line(tunni_line, bezier.C1, bezier.C2);
+                if (this.closed) {
+                    last_bezier.end = bezier.start;
+                    last_bezier.C2 = point.add(last_bezier.end, delta_2);
+
+                    this.upd_SVG_line(this.C2_lines[last_index], bezier.start, last_bezier.C2);
+                    this.upd_SVG_circle(this.C2_ui_els[last_index], last_bezier.C2);
+                    this.upd_SVG_line(this.tunni_lines[last_index], last_bezier.C1, last_bezier.C2);
+                }
             } else if (sel_el.attr("id") == "end") {
                 let delta = point.sub(bezier.C2, bezier.end);
                 let next_delta;
@@ -511,6 +574,10 @@ class path {
         }
     }
 
+    /**
+     * Ends dragging the node, node is no longer selected
+     * @param {MouseEvent} e the mouse event
+     */
     end_drag_node = (e) => {
         if (sel_el && sel_el.node().tagName == "circle") {
             sel_el.attr("r", "5px");
@@ -518,6 +585,10 @@ class path {
         }
     }
 
+    /**
+     * Starts dragging the tunni line
+     * @param {MouseEvent} e the mouse event
+     */
     start_drag_line = (e) => {
         if (sel_el && sel_el.node().tagName == "line") {
             sel_el
@@ -525,6 +596,10 @@ class path {
         }
     }
 
+    /**
+     * Drags the tunni line and scales the bezier handles accordingly
+     * @param {MouseEvent} e the mouse event
+     */
     drag_line = (e) => {
         let e_point = new point(e.x, e.y);
         if (sel_el && sel_el.node().tagName == "line") {
@@ -590,33 +665,33 @@ class path {
 
     /**
      * Returns whether point c is left of the line a-b;
-     * @param {point} a
-     * @param {point} b
-     * @param {point} c
-     * @returns
+     * @param {point} a first point of line
+     * @param {point} b second point of line
+     * @param {point} c point to check
+     * @returns {number} -1 if c is left, 1 if c is right, 0 if c is on the line
      */
     is_left(a, b, c) {
         return Math.sign((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
     }
     /**
      * Returns whether last two arguments lie on the same side of first two
-     * @param {point} a
-     * @param {point} b
-     * @param {point} c
-     * @param {point} d
-     * @returns
+     * @param {point} a first point of line
+     * @param {point} b second point of line
+     * @param {point} c first point
+     * @param {point} d second point
+     * @returns {boolean} true if c and d are on the same side of a-b
      */
     same_side(a, b, c, d) {
         return this.is_left(a, b, c) == this.is_left(a, b, d);
     }
 
     /**
-     *
-     * @param {point} a
-     * @param {point} b
-     * @param {point} c
-     * @param {point} d
-     * @returns
+     * Returns the intersection point of two lines defined by two points each
+     * @param {point} a first point of first line
+     * @param {point} b second point of first line
+     * @param {point} c first point of second line
+     * @param {point} d second point of second line
+     * @returns {point} intersection point
      */
     intersection(a, b, c, d) {
         let denominator = ((d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y))
@@ -634,11 +709,41 @@ class path {
      *
      * @param {bezier} s
      * @param {point} is intersection of the control point vectors
-     * @returns location
+     * @returns {point} location of the tunni point
      */
     tunni_location(bezier, is) {
         return point.sub(point.add(point.sub(point.mult(bezier.C1, 2), bezier.start),
             point.sub(point.mult(bezier.C2, 2), bezier.end)), is);
+    }
+
+    /**
+     * Returns the angle between 2d lines p1-p2 and p3-p4
+     * @param {point} p1 first point of first line
+     * @param {point} p2 second point of first line
+     * @param {point} p3 first point of second line
+     * @param {point} p4 second point of second line
+     * @returns 
+     */
+    angle_between = (p1, p2, p3, p4) => {
+        let v1 = point.sub(p2, p1);
+        let v2 = point.sub(p4, p3);
+        let dot = v1.x * v2.x + v1.y * v2.y;
+        let det = v1.x * v2.y - v1.y * v2.x;
+        return Math.atan2(det, dot);
+    }
+
+    /**
+     * Returns the distance between a line and a point
+     * @param {point} p1 first point of line
+     * @param {point} p2 second point of line
+     * @param {point} p3 point
+     * @returns {number} distance
+     */
+    distance_line_to_point = (p1, p2, p3) => {
+        let v1 = point.sub(p2, p1);
+        let v2 = point.sub(p3, p1);
+        let det = v1.x * v2.y - v1.y * v2.x;
+        return Math.abs(det) / Math.sqrt(v1.x ** 2 + v1.y ** 2);
     }
 }
 
@@ -646,17 +751,27 @@ class path {
 // create instances
 //================================================================================================//
 
-let X = new point(100, 100);
-let C1 = new point(250, 100);
-let C2 = new point(400, 250);
-let Y = new point(400, 400);
-
 let spline1 = new path();
 
 svg.on("dblclick", (e) => {
-    let x = e.x;
-    let y = e.y;
-    let p = new point(x, y);
-    console.log(p.to_string());
-    spline1.add_spline(p)
-})
+    if (!spline1.closed) {
+        spline1.add_spline(new point(e.x, e.y))
+    }
+});
+
+let d3_body = d3.select("body");
+
+d3_body.on("keydown", (e) => {
+    if (String.fromCharCode(e.which) == " ") {
+        spline1.ui.attr("opacity", 0);
+        spline1.p.attr("fill", "black");
+    }
+});
+
+
+d3_body.on("keyup", (e) => {
+    if (String.fromCharCode(e.which) == " ") {
+        spline1.ui.attr("opacity", 1);
+        spline1.p.attr("fill", "transparent");
+    }
+});

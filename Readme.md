@@ -80,7 +80,9 @@ be achieved as follows:
     $$c_x^{(1)} = a_x + \lambda^* \cdot \left(s_x - a_x\right) \qquad c_y^{(1)} = a_y + \lambda^* \cdot \left(s_y - a_y\right)$$
     $$c_x^{(2)} = b_x + \lambda^* \cdot \left(s_x - b_x\right) \qquad c_y^{(2)} = b_y + \lambda^* \cdot \left(s_y - b_y\right)$$
 
-This "balance"-operation is different from other balancing operations beause it does not necessarily ensure a smooth curve but just states that the tunni Line should be parralel to the line $\overline{ab}$.
+This "balance"-operation is different from other balancing operations beause it does not necessarily
+ensure a smooth curve (especially at the joints of two incident bezier curves) but just states that
+the tunni Line should be parralel to the line $\overline{ab}$.
 
 ## Constraints
 
@@ -92,7 +94,12 @@ $\overline{bc^{(2)}}$ should also lie on this side of $\overline{ab}$, i.e., the
 point towards one another, not away from each other (behaviour of the Tunni Point is weird when this
 is not the case).
 
-The Tunni Line can remain visible at all times.
+### When is the Tunni Line Useful
+
+The Tunni Line can remain visible at all times – well, almost. When both control points lie on the
+line $\overline{ab}$, dragging the tunni line (which always moves orthogonal to its direction) is
+not defined as the handles are not allowed to change direction leading to the control points no
+longer existing.
 
 ### Moving the Tunni Line
 
