@@ -152,7 +152,7 @@ class path {
         this.splines = [];
         this.p = svg.append("path")
             .attr("stroke", "black")
-            .attr("fill", "transparent");
+            .attr("fill", "rgba(0,0,0, 0.125)");
 
         this.is_ui_els = [];
         this.ui = svg.append("g").attr("id", "ui");
@@ -772,6 +772,7 @@ d3_body.on("keydown", (e) => {
 d3_body.on("keyup", (e) => {
     if (String.fromCharCode(e.which) == " ") {
         spline1.ui.attr("opacity", 1);
-        spline1.p.attr("fill", "transparent");
+        spline1.p.attr("fill", "rgba(0, 0, 0, 0.125)");
     }
 });
+
