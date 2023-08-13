@@ -347,13 +347,13 @@ class path {
             } else {
                 this.tunni_ui_els[i].attr("opacity", 0);
                 if (sel_el.attr("id") == "tunni") {
-                    this.end_drag_node();
+                    end_drag_node();
                 }
             }
         } else {
             this.tunni_ui_els[i].attr("opacity", 0);
             if (sel_el && sel_el.attr("id") == "tunni") {
-                this.end_drag_node();
+                end_drag_node();
             }
         }
 
