@@ -602,7 +602,6 @@ start_drag_node = (e) => {
  * @param {MouseEvent} e the event
  */
 drag_node = (e) => {
-    console.log("drag")
     if (sel_el && sel_el.node().tagName == "circle") {
         // initializing all the important variables
         let upd_tunni = true;
