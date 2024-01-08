@@ -12,126 +12,6 @@ svg.attr("width", "100%")
 sel_el = false;
 
 //================================================================================================//
-// defining main classes
-//================================================================================================//
-
-class point {
-    /**
-     * Constructs a new point
-     * @param {number} x x-Coordinate
-     * @param {number} y y-Coordinate
-     */
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    /**
-     * Add two points / vectors
-     * @param {point} p1 first point
-     * @param {point} p2 second point
-     */
-    static add = (p1, p2) => {
-        return new point(p1.x + p2.x, p1.y + p2.y);
-    }
-
-    /**
-     * Subtract two points / vectors
-     * @param {point} p1
-     * @param {point} p2
-     */
-    static sub = (p1, p2) => {
-        return new point(p1.x - p2.x, p1.y - p2.y);
-    }
-
-    /**
-     * Multiplies a point / vector with a number
-     * @param {point} p
-     * @param {number} c
-     * @returns
-     */
-    static mult = (p, c) => {
-        return new point(p.x * c, p.y * c);
-    }
-
-    /**
-     * Divide coordinates of point by number
-     * @param {point} p
-     * @param {Number} c
-     */
-    static div = (p, c) => {
-        if (c == 0) {
-            console.error("Division by zero!")
-            return p;
-        }
-        return new point(p.x / c, p.y / c)
-    }
-
-    static length = (p1, p2) => {
-        return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
-    }
-
-    to_string() {
-        return this.x + " " + this.y;
-    }
-}
-
-//================================================================================================//
-// class representing cubic bezier.
-//================================================================================================//
-
-class bezier {
-    /**
-     * Constructs a new cubic bezier spline from 4 points
-     * @param {point} start start-point
-     * @param {point} C1 control point one
-     * @param {point} C2 control point two
-     * @param {point} end end-point
-     */
-    constructor(start, C1, C2, end) {
-        /**
-         * @type{point}
-         */
-        this.start = start;
-        /**
-         * @type{point}
-         */
-        this.C1 = C1;
-        /**
-         * @type{point}
-         */
-        this.C2 = C2;
-        /**
-         * @type{point}
-         */
-        this.end = end;
-        /**
-         * @type{point}
-         */
-        this.is_point = new point(0, 0);
-        /**
-         * @type{point}
-         */
-        this.tunni_point = new point(0, 0);
-    }
-
-    to_string() {
-        return "M " // move to
-            + this.start.to_string()
-            + " C " // curve to
-            + this.C1.to_string() + ", "
-            + this.C2.to_string() + ", "
-            + this.end.to_string();
-    }
-
-    suffix_string() {
-        return " C " // curve to
-            + this.C1.to_string() + ", "
-            + this.C2.to_string() + ", "
-            + this.end.to_string();
-    }
-}
-
-//================================================================================================//
 // class representing a SVG path element with ui-controls.
 //================================================================================================//
 
@@ -199,8 +79,6 @@ class path {
         this.is_ui_els.push(this.is_group.append("circle")
             .attr("cx", curr.is_point.x + "px")
             .attr("cy", curr.is_point.y + "px")
-            .attr("fill", "gray")
-            .attr("r", "3px")
             .attr("id", "is")
             .attr("spline_nr", i)
             .attr("subpath_nr", this.index)
@@ -215,6 +93,7 @@ class path {
             .attr("subpath_nr", this.index)
             .attr("stroke", "steelblue")
             .attr("stroke-width", "3px")
+            .attr("opacity", "0.5")
             .attr("id", "tunni-line"));
 
         // control point 1
@@ -225,8 +104,7 @@ class path {
             .attr("y2", curr.C1.y)
             .attr("spline_nr", i)
             .attr("subpath_nr", this.index)
-            .attr("stroke-width", "1px")
-            .attr("stroke", "black"));
+            .attr("stroke-width", "1px"));
 
         this.C1_ui_els.push(this.C1_group.append("circle")
             .attr("cx", curr.C1.x + "px")
@@ -235,7 +113,8 @@ class path {
             .attr("subpath_nr", this.index)
             .attr("fill", "lightsteelblue")
             .attr("r", "5px")
-            .attr("id", "C1"));
+            .attr("id", "C1")
+            .attr("tabindex", "0"));
 
         this.C2_lines.push(this.C2_line_group.append("line")
             .attr("x1", curr.end.x)
@@ -254,7 +133,8 @@ class path {
             .attr("subpath_nr", this.index)
             .attr("fill", "lightsteelblue")
             .attr("r", "5px")
-            .attr("id", "C2"));
+            .attr("id", "C2")
+            .attr("tabindex", "0"));
 
         if (!this.closed) {
             this.end_ui_els.push(this.end_group.append("circle")
@@ -264,7 +144,8 @@ class path {
                 .attr("subpath_nr", this.index)
                 .attr("fill", "steelblue")
                 .attr("r", "5px")
-                .attr("id", "end"));
+                .attr("id", "end")
+                .attr("tabindex", "0"));
         }
         // tunni point
         this.tunni_ui_els.push(this.tunni_group.append("circle")
@@ -275,7 +156,7 @@ class path {
             .attr("fill", "steelblue")
             .attr("r", "5px")
             .attr("id", "tunni")
-            .attr("opacity", 0)
+            .attr("style", "display: none")
             .on("dblclick", (e) => {
                 this.balance(i);
                 // stop event propagation
@@ -299,7 +180,8 @@ class path {
             .attr("subpath_nr", this.index)
             .attr("fill", "steelblue")
             .attr("r", "5px")
-            .attr("id", "start");
+            .attr("id", "start")
+            .attr("tabindex", "0");
         this.start_ui_el.on("dblclick", (e) => {
             e.cancelBubble = true;
             this.add_point(this.start);
@@ -313,7 +195,13 @@ class path {
      * @param {boolean} update_tunni whether thhe tunni point should be updated
      * @param {number} i number of the spline
      */
-    update_path(update_tunni, i) {
+    update_path(update_tunni, i, j = i) {
+        if (this.splines.length == 0) {
+            return;
+        }
+        if (j != i) {
+            this.update_path(update_tunni, j);
+        }
         this.parent.p.attr("d", this.parent.to_string());
         // update tunni point
         let bezier = this.splines[i];
@@ -328,11 +216,11 @@ class path {
         if (this.same_side(bezier.start, bezier.end, bezier.C1, bezier.C2)) {
             if (this.same_side(bezier.start, bezier.end, bezier.C1, is)) {
                 this.is_ui_els[i]
-                    .attr("opacity", 1);
+                    .attr("style", "display: inline");
                 this.upd_SVG_circle(this.is_ui_els[i], is);
                 if (i + 1 < this.splines.length) {
                     this.is_ui_els[i + 1]
-                        .attr("opacity", 1);
+                        .attr("style", "display: inline");
                     this.upd_SVG_circle(this.is_ui_els[i + 1], next_is);
                 }
                 if (update_tunni) {
@@ -343,15 +231,15 @@ class path {
                         this.upd_SVG_circle(this.tunni_ui_els[i + 1], next_tunni);
                     }
                 }
-                this.tunni_ui_els[i].attr("opacity", 1);
+                this.tunni_ui_els[i].attr("style", "display: inline");
             } else {
-                this.tunni_ui_els[i].attr("opacity", 0);
+                this.tunni_ui_els[i].attr("style", "display: none");
                 if (sel_el.attr("id") == "tunni") {
                     end_drag_node();
                 }
             }
         } else {
-            this.tunni_ui_els[i].attr("opacity", 0);
+            this.tunni_ui_els[i].attr("style", "display: none");
             if (sel_el && sel_el.attr("id") == "tunni") {
                 end_drag_node();
             }
@@ -359,9 +247,9 @@ class path {
 
         if (this.distance_line_to_point(bezier.start, bezier.end, bezier.C1) < 7
             && this.distance_line_to_point(bezier.start, bezier.end, bezier.C2) < 7) {
-            this.tunni_lines[i].attr("opacity", 0);
+            this.tunni_lines[i].attr("style", "display: none");
         } else {
-            this.tunni_lines[i].attr("opacity", 1);
+            this.tunni_lines[i].attr("style", "display: inline");
         }
     }
 
@@ -413,12 +301,16 @@ class path {
     balance = (i) => {
         let bezier = this.splines[i];
         let is = this.intersection(bezier.start, bezier.C1, bezier.C2, bezier.end);
-
         let C1_scale = point.length(bezier.C1, bezier.start) / point.length(is, bezier.start);
         let C2_scale = point.length(bezier.C2, bezier.end) / point.length(is, bezier.end);
 
         let avg = (C1_scale + C2_scale) / 2;
-
+        console.log(avg);
+        // when both start and end points have same coordinates, avg is NaN
+        // the programm behaves insensibly in this case.
+        if (avg !== avg) {
+            return;
+        }
         bezier.C1 = point.add(bezier.start, point.mult(point.sub(is, bezier.start), avg));
         bezier.C2 = point.add(bezier.end, point.mult(point.sub(is, bezier.end), avg));
 
@@ -432,7 +324,7 @@ class path {
 
 
 
-    
+
     //============================================================================================//
     // getters and setters
     //============================================================================================//
@@ -526,7 +418,7 @@ class path {
      * @param {point} p2 second point of first line
      * @param {point} p3 first point of second line
      * @param {point} p4 second point of second line
-     * @returns 
+     * @returns
      */
     angle_between = (p1, p2, p3, p4) => {
         let v1 = point.sub(p2, p1);
@@ -551,6 +443,12 @@ class path {
     }
 }
 
+
+//================================================================================================//
+//
+// logic for dragging ui elements
+//
+//================================================================================================//
 
 make_draggable = (ui_el) => {
     ui_el.on("mousedown", start_drag);
@@ -605,10 +503,14 @@ drag_node = (e) => {
     if (sel_el && sel_el.node().tagName == "circle") {
         // initializing all the important variables
         let upd_tunni = true;
-        let i = parseInt(sel_el.attr("spline_nr"));
+
         let sp_nr = parseInt(sel_el.attr("subpath_nr"));
         let subpath = pp.subpaths[sp_nr];
+
+        let i = parseInt(sel_el.attr("spline_nr"));
+        let j = i;
         let bezier = subpath.splines[i];
+
         let C1_line = subpath.C1_lines[i];
         let C2_line = subpath.C2_lines[i];
         let tunni_line = subpath.tunni_lines[i];
@@ -617,11 +519,14 @@ drag_node = (e) => {
         let next_bezier = subpath.splines[i + 1];
         let e_point = new point(e.x, e.y);
 
-        // update the position of the svg element
-        subpath.upd_SVG_circle(sel_el, e_point);
-
         // update the positions of the control points and the tunni point
-        if (sel_el.attr("id") == "start") {
+        if (sel_el.attr("id") == "start" && subpath.splines.length == 0) {
+            subpath.start = e_point;
+        }
+        else if (sel_el.attr("id") == "start") {
+            if (subpath.splines.length == 0) {
+                subpath.start = e_point;
+            }
             let delta = point.sub(bezier.C1, bezier.start);
             let delta_2, last_index, last_bezier;
             if (subpath.closed) {
@@ -629,6 +534,7 @@ drag_node = (e) => {
                 last_bezier = subpath.splines[last_index];
                 delta_2 = point.sub(last_bezier.C2, last_bezier.end);
             }
+
             bezier.start = e_point;
             subpath.start = e_point;
             bezier.C1 = point.add(bezier.start, delta);
@@ -666,163 +572,386 @@ drag_node = (e) => {
             subpath.upd_SVG_circle(C2_ui_el, bezier.C2);
             subpath.upd_SVG_line(tunni_line, bezier.C1, bezier.C2);
         } else if (sel_el.attr("id") == "C1") {
+            let C1 = bezier.C1;
+            let start = bezier.start;
+            let delta = point.sub(C1, start);
+            let delta_2 = point.sub(e_point, start);
+            let adjacent_spline = (i > 0) ? subpath.splines[i - 1]
+                : (subpath.closed) ? subpath.splines[subpath.splines.length - 1] : undefined;
+            if (bezier.is_start_hv_locked) {
+                // if C1 point is locked to horizontal
+                HV_lock(delta, delta_2, e_point, start);
+            }
+            if (bezier.start_point_type == point_types.smooth) {
+                // if bezier is not first spline
+                if (i > 0 || subpath.closed) {
+                    // fetch bezier
+                    j = (i > 0) ? i - 1 : subpath.splines.length - 1;
+                    prev_bezier = subpath.splines[j];
+                    prev_C2_ui_el = subpath.C2_ui_els[j];
+                    prev_C2_line = subpath.C2_lines[j];
+
+                    prev_C2 = prev_bezier.C2;
+                    prev_C2_length = point.length(prev_C2, prev_bezier.end);
+                    dC1 = point.sub(C1, start);
+                    let p_new = point.sub(start, dC1);
+                    p_new = point.stretch_to_length(start, p_new, prev_C2_length);
+                    prev_bezier.C2 = p_new;
+                    subpath.upd_SVG_circle(prev_C2_ui_el, prev_bezier.C2);
+                    subpath.upd_SVG_line(prev_C2_line, start, prev_bezier.C2);
+                    subpath.upd_SVG_line(subpath.tunni_lines[j], prev_bezier.C1, prev_bezier.C2);
+                }
+            }
             bezier.C1 = e_point;
             subpath.upd_SVG_line(C1_line, bezier.start, e_point);
             subpath.upd_SVG_line(tunni_line, e_point, bezier.C2);
         } else if (sel_el.attr("id") == "C2") {
-            bezier.C2 = e_point;
-            C2_line
-                .attr("x2", e_point.x)
-                .attr("y2", e_point.y);
-            tunni_line
-                .attr("x2", e_point.x)
-                .attr("y2", e_point.y);
-        } else if (sel_el.attr("id") == "tunni") {
-            upd_tunni = false;
-            bezier.tunni_point = e_point;
+            let C2 = bezier.C2;
+            let end = bezier.end;
+            let delta = point.sub(bezier.C2, bezier.end);
+            let delta_2 = point.sub(e_point, bezier.end);
 
-            let C1_halfway_point = point.div(point.add(bezier.tunni_point, bezier.start), 2)
-            let C2_vector = point.add(point.sub(bezier.C2, bezier.end), C1_halfway_point);
-            let C1_intersection = subpath.intersection(C1_halfway_point, C2_vector,
-                bezier.start, bezier.C1);
+            if (bezier.is_end_hv_locked) {
+                // if C2 point is locked to horizontal
+                HV_lock(delta, delta_2, e_point, end);
+            }
+            if (bezier.end_point_type == point_types.smooth) {
+                // if bezier is not last spline
+                if (i < subpath.splines.length - 1 || subpath.closed) {
+                    // fetch bezier
+                    j = (i < subpath.splines.length - 1) ? i + 1 : 0;
+                    next_bezier = subpath.splines[j];
+                    next_C1_ui_el = subpath.C1_ui_els[j];
+                    next_C1_line = subpath.C1_lines[j];
 
-            bezier.C1 = C1_intersection;
+                    next_C1 = next_bezier.C1;
+                    next_C1_length = point.length(next_C1, next_bezier.start);
+                    dC2 = point.sub(C2, end);
+                    let p_new = point.sub(end, dC2);
+                    p_new = point.stretch_to_length(end, p_new, next_C1_length);
+                    next_bezier.C1 = p_new;
+                    subpath.upd_SVG_circle(next_C1_ui_el, next_bezier.C1);
+                    subpath.upd_SVG_line(next_C1_line, end, next_bezier.C1);
+                    subpath.upd_SVG_line(subpath.tunni_lines[j], next_bezier.C1, next_bezier.C2);
+                }
 
-            subpath.upd_SVG_circle(C1_ui_el, bezier.C1);
-            subpath.upd_SVG_line(C1_line, bezier.start, bezier.C1);
+            }
+                bezier.C2 = e_point;
+                subpath.upd_SVG_line(C2_line, bezier.end, e_point);
+                subpath.upd_SVG_line(tunni_line, bezier.C1, e_point);
+            } else if (sel_el.attr("id") == "tunni") {
+                upd_tunni = false;
+                bezier.tunni_point = e_point;
 
-            let C2_halfway_point = point.div(point.add(bezier.tunni_point, bezier.end), 2)
-            let C1_vector = point.add(point.sub(bezier.C1, bezier.start), C2_halfway_point);
-            let C2_intersection = subpath.intersection(C2_halfway_point,
-                C1_vector, bezier.end, bezier.C2);
+                let C1_halfway_point = point.div(point.add(bezier.tunni_point, bezier.start), 2)
+                let C2_vector = point.add(point.sub(bezier.C2, bezier.end), C1_halfway_point);
+                let C1_intersection = subpath.intersection(C1_halfway_point, C2_vector,
+                    bezier.start, bezier.C1);
 
-            bezier.C2 = C2_intersection;
+                bezier.C1 = C1_intersection;
 
-            subpath.upd_SVG_circle(C2_ui_el, bezier.C2);
-            subpath.upd_SVG_line(C2_line, bezier.end, bezier.C2);
-            subpath.upd_SVG_line(tunni_line, bezier.C1, bezier.C2);
+                subpath.upd_SVG_circle(C1_ui_el, bezier.C1);
+                subpath.upd_SVG_line(C1_line, bezier.start, bezier.C1);
+
+                let C2_halfway_point = point.div(point.add(bezier.tunni_point, bezier.end), 2)
+                let C1_vector = point.add(point.sub(bezier.C1, bezier.start), C2_halfway_point);
+                let C2_intersection = subpath.intersection(C2_halfway_point,
+                    C1_vector, bezier.end, bezier.C2);
+
+                bezier.C2 = C2_intersection;
+
+                subpath.upd_SVG_circle(C2_ui_el, bezier.C2);
+                subpath.upd_SVG_line(C2_line, bezier.end, bezier.C2);
+                subpath.upd_SVG_line(tunni_line, bezier.C1, bezier.C2);
+            }
+            // update the position of the svg element
+            subpath.upd_SVG_circle(sel_el, e_point);
+            // update the path
+            subpath.update_path(upd_tunni, i, j);
         }
-        subpath.update_path(upd_tunni, i);
-    }
-}
-
-/**
- * Ends dragging the node, node is no longer selected
- * @param {MouseEvent} e the mouse event
- */
-end_drag_node = (e) => {
-    if (sel_el && sel_el.node().tagName == "circle") {
-        sel_el.attr("r", "5px");
-        sel_el = false;
-    }
-}
-
-/**
- * Starts dragging the tunni line
- * @param {MouseEvent} e the mouse event
- */
-start_drag_line = (e) => {
-    if (sel_el && sel_el.node().tagName == "line") {
-        sel_el
-            .attr("stroke-width", "5px");
-    }
-}
-
-/**
- * Drags the tunni line and scales the bezier handles accordingly
- * @param {MouseEvent} e the mouse event
- */
-drag_line = (e) => {
-    let e_point = new point(e.x, e.y);
-    if (sel_el && sel_el.node().tagName == "line") {
-        let i = parseInt(sel_el.attr("spline_nr"));
-        let sp_nr = parseInt(sel_el.attr("subpath_nr"));
-        let subpath = pp.subpaths[sp_nr];
-        let bezier = subpath.splines[i];
-        let tl_vector = point.sub(point.add(e_point, bezier.C2), bezier.C1);
-        bezier.C1 = subpath.intersection(e, tl_vector, bezier.start, bezier.C1);
-        bezier.C2 = subpath.intersection(e, tl_vector, bezier.end, bezier.C2);
-        subpath.upd_SVG_circle(subpath.C1_ui_els[i], bezier.C1);
-        subpath.upd_SVG_line(subpath.C1_lines[i], bezier.start, bezier.C1);
-        subpath.upd_SVG_circle(subpath.C2_ui_els[i], bezier.C2);
-        subpath.upd_SVG_line(subpath.C2_lines[i], bezier.end, bezier.C2);
-        subpath.upd_SVG_line(subpath.tunni_lines[i], bezier.C1, bezier.C2);
-        subpath.update_path(true, i);
-    }
-}
-
-/**
- * Ends the dragging of the Tunni Lines and resets the state of the system
- * @param {MouseEvent} e mouseup-event
- */
-end_drag_line = (e) => {
-    if (sel_el && sel_el.node().tagName == "line") {
-        sel_el
-            .attr("stroke-width", "3px");
-        sel_el = false;
-    }
-}
 
 
-//================================================================================================//
-// create instances
-//================================================================================================//
-
-class polypath {
-    constructor() {
-        /**
-         * @type {path[]}
-         */
-        this.subpaths = [];
-        this.p = svg.append("path")
-            .attr("stroke", "black")
-            .attr("fill", "rgba(0,0,0, 0.125)");
-
-    };
-
-    add_path = (path) => {
-        this.subpaths.push(path);
     }
 
-    to_string = () => {
-        let str = "";
-        for (let subpath of this.subpaths) {
-            str += " " + subpath.spline_string();
-        }
-        return str;
-    }
-
-
-}
-
-let pp = new polypath();
-svg.on("dblclick", (e) => {
-    if (pp.subpaths.length > 0 && !pp.subpaths[pp.subpaths.length - 1].closed) {
-        pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
-    } else {
-        pp.add_path(new path(pp, pp.subpaths.length));
-        pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
-    }
-});
-
-let d3_body = d3.select("body");
-
-d3_body.on("keydown", (e) => {
-    if (String.fromCharCode(e.which) == " ") {
-        for (let subpath of pp.subpaths) {
-            subpath.ui.attr("opacity", 0);
-            pp.p.attr("fill", "black");
+    let HV_lock = (delta, delta_2, e_point, start) => {
+        if (Math.abs(delta.y) < Math.abs(delta.x)) {
+            if (Math.abs(delta_2.y) > Math.abs(delta.x)) {
+                // C1 point should be locked to vertical
+                e_point.x = start.x;
+                e_point.y = e_point.y;
+            } else {
+                // C1 point should remain locked to horizontal
+                console.log("2");
+                e_point.y = start.y;
+            }
+        } else if (Math.abs(delta.x) < Math.abs(delta.y)) { // if C1 point is locked to vertical
+            if (Math.abs(delta_2.x) > Math.abs(delta.y)) {
+                // C1 point should be locked to horizontal
+                e_point.y = start.y;
+                e_point.x = e_point.x;
+            } else {
+                // C1 point should remain locked to vertical
+                e_point.x = start.x;
+            }
         }
     }
-});
 
-d3_body.on("keyup", (e) => {
-    if (String.fromCharCode(e.which) == " ") {
-        for (let subpath of pp.subpaths) {
-            subpath.ui.attr("opacity", 1);
-            pp.p.attr("fill", "rgba(0, 0, 0, 0.125)");
+    /**
+     * Ends dragging the node, node is no longer selected
+     * @param {MouseEvent} e the mouse event
+     */
+    end_drag_node = (e) => {
+        if (sel_el && sel_el.node().tagName == "circle") {
+            sel_el.attr("r", "5px");
+            sel_el = false;
         }
     }
-});
 
+    /**
+     * Starts dragging the tunni line
+     * @param {MouseEvent} e the mouse event
+     */
+    start_drag_line = (e) => {
+        if (sel_el && sel_el.node().tagName == "line") {
+            sel_el
+                .attr("stroke-width", "5px")
+                .attr("opacity", "1");
+        }
+    }
+
+    /**
+     * Drags the tunni line and scales the bezier handles accordingly
+     * @param {MouseEvent} e the mouse event
+     */
+    drag_line = (e) => {
+        let e_point = new point(e.x, e.y);
+        if (sel_el && sel_el.node().tagName == "line") {
+            let i = parseInt(sel_el.attr("spline_nr"));
+            let sp_nr = parseInt(sel_el.attr("subpath_nr"));
+            let subpath = pp.subpaths[sp_nr];
+            let bezier = subpath.splines[i];
+            let tl_vector = point.sub(point.add(e_point, bezier.C2), bezier.C1);
+            bezier.C1 = subpath.intersection(e, tl_vector, bezier.start, bezier.C1);
+            bezier.C2 = subpath.intersection(e, tl_vector, bezier.end, bezier.C2);
+            subpath.upd_SVG_circle(subpath.C1_ui_els[i], bezier.C1);
+            subpath.upd_SVG_line(subpath.C1_lines[i], bezier.start, bezier.C1);
+            subpath.upd_SVG_circle(subpath.C2_ui_els[i], bezier.C2);
+            subpath.upd_SVG_line(subpath.C2_lines[i], bezier.end, bezier.C2);
+            subpath.upd_SVG_line(subpath.tunni_lines[i], bezier.C1, bezier.C2);
+            subpath.update_path(true, i);
+        }
+    }
+
+    /**
+     * Ends the dragging of the Tunni Lines and resets the state of the system
+     * @param {MouseEvent} e mouseup-event
+     */
+    end_drag_line = (e) => {
+        if (sel_el && sel_el.node().tagName == "line") {
+            sel_el
+                .attr("stroke-width", "3px")
+                .attr("opacity", "0.5");
+            sel_el = false;
+        }
+    }
+
+
+    //================================================================================================//
+    // create instances
+    //================================================================================================//
+
+
+
+    // add big instruction text before any points have been added
+    svg.append("text")
+        .attr("id", "instructions")
+        .attr("x", "50%")
+        .attr("y", "50%")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("font-size", "5em")
+        .attr("fill", "lightgrey")
+        .attr("style", "user-select: none")
+        .text("Double-Click to add points!");
+
+
+    let pp = new polypath();
+    svg.on("dblclick", (e) => {
+        if (pp.subpaths.length > 0 && !pp.subpaths[pp.subpaths.length - 1].closed) {
+            pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
+        } else {
+            svg.select("#instructions").remove();
+            pp.add_path(new path(pp, pp.subpaths.length));
+            pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
+        }
+    });
+
+    let d3_body = d3.select("body");
+
+    let alt_pressed = false;
+
+    d3_body.on("keydown", (e) => {
+        if (String.fromCharCode(e.which) == " ") {
+            for (let subpath of pp.subpaths) {
+                subpath.ui.attr("opacity", 0);
+                pp.p.attr("fill", "black");
+            }
+        } else if (e.altKey) {
+            e.preventDefault();
+            alt_pressed = true;
+        }
+    });
+
+    d3_body.on("keyup", (e) => {
+        if (String.fromCharCode(e.which) == " ") {
+            for (let subpath of pp.subpaths) {
+                subpath.ui.attr("opacity", 1);
+                pp.p.attr("fill", "rgba(0, 0, 0, 0.125)");
+            }
+        } else if (e.altKey) {
+            alt_pressed = false;
+        }
+    });
+
+    document.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+        if (!svg.select(":focus").empty()) {
+            let el = svg.select(":focus");
+            let spline_nr = parseInt(el.attr("spline_nr"));
+            let subpath_nr = parseInt(el.attr("subpath_nr"));
+            let subpath = pp.subpaths[subpath_nr];
+            let bezier = subpath.splines[spline_nr];
+            if (el.attr("id") == "start") {
+                d3.select("#node_type").attr("style", "display: block");
+                d3.select("#lock").attr("style", "display: none");
+
+                d3.select("#corner_radio").property("checked", bezier.start_point_type == point_types.corner);
+                d3.select("#smooth_radio").property("checked", bezier.start_point_type == point_types.smooth);
+            } else if (el.attr("id") == "end") {
+                d3.select("#node_type").attr("style", "display: block");
+                d3.select("#lock").attr("style", "display: none");
+
+                d3.select("#corner_radio").property("checked", bezier.end_point_type == point_types.corner);
+                d3.select("#smooth_radio").property("checked", bezier.end_point_type == point_types.smooth);
+
+                d3.select("[name='curve_type']");
+            }
+            else if (el.attr("id") == "C1") {
+                d3.select("#lock").attr("style", "display: block");
+                if (bezier.is_start_hv_locked) {
+                    d3.select("#hv-lock").attr("style", "font-weight: bold");
+                } else {
+                    d3.select("#hv-lock").attr("style", "font-weight: normal");
+                }
+                d3.select("#hv-lock_checkbox").property("checked", bezier.is_start_hv_locked);
+                d3.select("#node_type").attr("style", "display: none");
+            } else if (el.attr("id") == "C2") {
+                d3.select("#lock").attr("style", "display: block");
+                if (bezier.is_start_hv_locked) {
+                    d3.select("#hv-lock").attr("style", "font-weight: bold");
+                } else {
+                    d3.select("#hv-lock").attr("style", "font-weight: normal");
+                }
+                d3.select("#hv-lock_checkbox").property("checked", bezier.is_start_hv_locked);
+                d3.select("#node_type").attr("style", "display: none");
+            }
+
+            var tooltip = document.getElementById('tooltip');
+            tooltip.className = 'visible';
+            tooltip.style.left = event.pageX + 20 + 'px';
+            tooltip.style.top = event.pageY - 20 + 'px';
+        }
+    });
+
+    let contextmenu = d3.select("#tooltip");
+
+    contextmenu.on("mousedown", (e) => {
+        e.preventDefault();
+    });
+
+    contextmenu.selectAll('[name="curve_type"]').on("change", (e) => {
+        e.preventDefault();
+        if (!svg.select(":focus").empty()) {
+            let el = svg.select(":focus");
+            let spline_nr = parseInt(el.attr("spline_nr"));
+            let subpath_nr = parseInt(el.attr("subpath_nr"));
+            let subpath = pp.subpaths[subpath_nr];
+            let bezier = subpath.splines[spline_nr];
+            if (el.attr("id") == "start") {
+                bezier.start_point_type = parseInt(e.target.value);
+            } else if (el.attr("id") == "end") {
+                bezier.end_point_type = parseInt(e.target.value);
+                console.log(e.target.value);
+            }
+            // subpath.update_path(true, spline_nr);
+        }
+    });
+
+    contextmenu.select("#corner").on("mousedown", (e) => {
+        e.preventDefault();
+        if (!svg.select(":focus").empty()) {
+            console.log("corner");
+            set_point_type(point_types.corner);
+        }
+    });
+
+    contextmenu.select("#smooth").on("mousedown", (e) => {
+        e.preventDefault();
+        if (!svg.select(":focus").empty()) {
+            console.log("smooth");
+            set_point_type(point_types.smooth);
+        }
+    });
+
+    contextmenu.select("#hv-lock").on("mousedown", (e) => {
+        e.preventDefault();
+        if (!svg.select(":focus").empty()) {
+            let el = svg.select(":focus");
+            let spline_nr = parseInt(el.attr("spline_nr"));
+            let subpath_nr = parseInt(el.attr("subpath_nr"));
+            let subpath = pp.subpaths[subpath_nr];
+            let bezier = subpath.splines[spline_nr];
+            if (el.attr("id") == "start" || el.attr("id") == "C1") {
+                console.log("start");
+                bezier.is_start_hv_locked = !bezier.is_start_hv_locked;
+            } else if (el.attr("id") == "end" || el.attr("id") == "C2") {
+                console.log("end");
+                bezier.is_end_hv_locked = !bezier.is_end_hv_locked;
+            }
+            subpath.update_path(true, spline_nr);
+        }
+    });
+
+
+    document.addEventListener('click', (event) => {
+        const isTooltip = event.target === tooltip || tooltip.contains(event.target);
+        if (!isTooltip) {
+            tooltip.className = '';
+        }
+    });
+
+
+    function set_point_type(type) {
+        let el = svg.select(":focus");
+
+        let subpath_nr = parseInt(el.attr("subpath_nr"));
+        let subpath = pp.subpaths[subpath_nr];
+
+        let spline_nr = parseInt(el.attr("spline_nr"));
+        let bezier = subpath.splines[spline_nr];
+
+        if (el.attr("id") == "start") {
+            bezier.start_point_type = type;
+            if (subpath.closed) {
+                next_bezier = subpath.splines[subpath.splines.length - 1];
+                next_bezier.end_point_type = type;
+            }
+        } else if (el.attr("id") == "end") {
+            bezier.end_point_type = type;
+            if (spline_nr < subpath.splines.length - 1) {
+                next_bezier = subpath.splines[spline_nr + 1];
+                next_bezier.start_point_type = type;
+            }
+        }
+    }
 

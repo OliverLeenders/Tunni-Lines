@@ -32,6 +32,8 @@ $(c_x^{(2)}, c_y^{(2)})$ and an endpoint $(b_x, b_y)$, as well as the intersecti
 control handles $(s_x, s_y)$ the position of the Tunni Control point $(t_x, t_y)$ is defined as
 follows:
 
+$$t = 2 c^{(1)} + 2 c^{(2)} - b - s$$
+
 $$t_x = 2 \cdot c_x^{(1)} - a_x + 2 \cdot c_x^{(2)} - b_x - s_x$$
 
 $$t_y = 2 \cdot c_y^{(1)} - a_y + 2 \cdot c_y^{(2)} - b_y - s_y$$
@@ -72,8 +74,8 @@ In FontLab, it is possible to double click the Tunni Point to balance out the be
 be achieved as follows:
 
 1. Compute the scale factors for both the control handles:
-    $$\lambda^{(1)} = \frac{\sqrt{\left(c_x^{(1)} - a_x\right)^2 + \left(c_y^{(1)} - a_y\right)^2}}{\sqrt{\left(s_x - a_x\right)^2 + \left(s_y - a_y\right)^2}}$$
-    $$\lambda^{(2)} = \frac{\sqrt{\left(c_x^{(2)} - b_x\right)^2 + \left(c_y^{(2)} - b_y\right)^2}}{\sqrt{\left(s_x - b_x\right)^2 + \left(s_y - b_y\right)^2}}$$
+    $$\lambda^{(1)} = \frac{||\overline{ca}||_2}{||\overline{sa}||_2} = \frac{\sqrt{\left(c_x^{(1)} - a_x\right)^2 + \left(c_y^{(1)} - a_y\right)^2}}{\sqrt{\left(s_x - a_x\right)^2 + \left(s_y - a_y\right)^2}}$$
+    $$\lambda^{(2)} = \frac{||\overline{cb}||_2}{||\overline{sb}||_2} = \frac{\sqrt{\left(c_x^{(2)} - b_x\right)^2 + \left(c_y^{(2)} - b_y\right)^2}}{\sqrt{\left(s_x - b_x\right)^2 + \left(s_y - b_y\right)^2}}$$
 2. Take the average of both scale factors.
     $$\lambda^* = \frac{\lambda^{(1)} + \lambda^{(2)}}{2}$$
 3. Rescale the handles using $\lambda^{\ast}$.

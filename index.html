@@ -5,20 +5,51 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <title>Tunni Lines</title>
+    <!-- The d3 library is used to manipulate the svg. -->
     <script src="d3.js" charset="utf-8"></script>
+    <!-- The index.css file contains some styling for the page and the svg. -->
     <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
     <!-- The svg populated and modified solely using javascript. -->
-    <svg></svg>
+    <svg>
+        <linearGradient id="grad">
+            <stop offset="0%" stop-color="#aaaaaa" />
+            <stop offset="100%" stop-color="#000000" />
+        </linearGradient>
+    </svg>
+    <div id="tooltip">
+        <div id="tooltip-text">
+            <div id="node_type">
+                <div id="corner">
+                    <input type="radio" name="curve_type" id="corner_radio" value="0" checked>
+                    <label for="corner_radio" id="corner_text">Corner</label>
+                </div>
+                <div id="smooth">
+                    <input type="radio" name="curve_type" id="smooth_radio" value="1">
+                    <label for="smooth_radio" id="smooth_text">Smooth</label>
+                </div>
+            </div>
+            <div id="lock">
+                <div id="hv-lock">
+                    <input type="checkbox" name="hv-lock" id="hv-lock_checkbox" value="0">
+                    <label id="hv-lock_text">HV-Lock</label>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <!-- Footer containing usage info and creditations. -->
 <footer style="height: 50px; font-size: 12px;">
-    <b>Double-Click to add new point. Double-Click again to define a cubic bezier spline. Press 
+    <b>Double-Click to add new point. Double-Click again to define a cubic bezier spline. Press
         Space to preview the spline and hide the control points.
     </b>
     <br>
     The Tunni lines concept was devised by Eduardo Tunni
-    and Fontlab Ltd., and is used in the FontLab font editor.</footer>
+    and Fontlab Ltd., and is used in the FontLab font editor.
+</footer>
+<script src="bezier.js" charset="utf-8"></script>
 <script src="index.js" charset="utf-8"></script>
+
 </html>
