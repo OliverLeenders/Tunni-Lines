@@ -847,12 +847,12 @@ drag_node = (e) => {
                 d3.select("#node_type").attr("style", "display: none");
             } else if (el.attr("id") == "C2") {
                 d3.select("#lock").attr("style", "display: block");
-                if (bezier.is_start_hv_locked) {
+                if (bezier.is_end_hv_locked) {
                     d3.select("#hv-lock").attr("style", "font-weight: bold");
                 } else {
                     d3.select("#hv-lock").attr("style", "font-weight: normal");
                 }
-                d3.select("#hv-lock_checkbox").property("checked", bezier.is_start_hv_locked);
+                d3.select("#hv-lock_checkbox").property("checked", bezier.is_end_hv_locked);
                 d3.select("#node_type").attr("style", "display: none");
             }
 

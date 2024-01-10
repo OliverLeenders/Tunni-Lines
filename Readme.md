@@ -11,6 +11,12 @@ repository.
 
 https://oliverleenders.github.io/Tunni-Lines/
 
+<img src="img/tunni1.png" height="200">
+<img src="img/tunni2.png" height="200">
+
+<img src="img/contextmenu1.png" height="200">
+<img src="img/contextmenu2.png" height="200">
+
 ## Motivation
 
 I have been amazed by the ingenuity and ease of use of FontLab's _Tunni Line_ feature. Using either
