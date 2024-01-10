@@ -113,3 +113,9 @@ longer existing.
 
 Additional checks are required when moving the tunni line such that no control points passes through
 its corresponding anchor during scaling. When this happens, the dragging should end immediately.
+
+## Roadmap
+
+* Undo/Redo
+* Download SVG
+* (if I have a lot of time: snapping)
