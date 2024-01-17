@@ -38,7 +38,7 @@ $(c_x^{(2)}, c_y^{(2)})$ and an endpoint $(b_x, b_y)$, as well as the intersecti
 control handles $(s_x, s_y)$ the position of the Tunni Control point $(t_x, t_y)$ is defined as
 follows:
 
-$$t = 2 c^{(1)} + 2 c^{(2)} - b - s$$
+$$t = 2 c^{(1)} - a + 2 c^{(2)} - b - s$$
 
 $$t_x = 2 \cdot c_x^{(1)} - a_x + 2 \cdot c_x^{(2)} - b_x - s_x$$
 
@@ -59,7 +59,7 @@ follows:
 
     $$h_x(b) = \frac{b_x + t_x}{2}, \qquad h_y(b) = \frac{b_y + t_y}{2}$$
 
-3. Add to $h(a)$ (or $h(b)$) the vector of the second (or first) control point $c^{(2)}$ (or
+3. Add to $h(a)$ (or ${h(b)}$) the vector of the second (or first) control point $c^{(2)}$ (or
     $c^{(1)}$).
     $$h_x'(a) = h_x(a) + c_x^{(2)} - b_x, \qquad h_y'(a) = h_y(a) + c_y^{(2)} - b_y$$
 
