@@ -441,6 +441,21 @@ class path {
         let det = v1.x * v2.y - v1.y * v2.x;
         return Math.abs(det) / Math.sqrt(v1.x ** 2 + v1.y ** 2);
     }
+
+    /**
+     * creates a clone of the path
+     * @returns {path} clone
+     */
+    clone(parent = this.parent) {
+        let clone = new path(parent, this.index);
+        clone.splines = [];
+        for (let spline of this.splines) {
+            clone.splines.push(spline.clone());
+        }
+        clone.closed = this.closed;
+        return clone;
+
+    }
 }
 
 
@@ -636,322 +651,322 @@ drag_node = (e) => {
                 }
 
             }
-                bezier.C2 = e_point;
-                subpath.upd_SVG_line(C2_line, bezier.end, e_point);
-                subpath.upd_SVG_line(tunni_line, bezier.C1, e_point);
-            } else if (sel_el.attr("id") == "tunni") {
-                upd_tunni = false;
-                bezier.tunni_point = e_point;
+            bezier.C2 = e_point;
+            subpath.upd_SVG_line(C2_line, bezier.end, e_point);
+            subpath.upd_SVG_line(tunni_line, bezier.C1, e_point);
+        } else if (sel_el.attr("id") == "tunni") {
+            upd_tunni = false;
+            bezier.tunni_point = e_point;
 
-                let C1_halfway_point = point.div(point.add(bezier.tunni_point, bezier.start), 2)
-                let C2_vector = point.add(point.sub(bezier.C2, bezier.end), C1_halfway_point);
-                let C1_intersection = subpath.intersection(C1_halfway_point, C2_vector,
-                    bezier.start, bezier.C1);
+            let C1_halfway_point = point.div(point.add(bezier.tunni_point, bezier.start), 2)
+            let C2_vector = point.add(point.sub(bezier.C2, bezier.end), C1_halfway_point);
+            let C1_intersection = subpath.intersection(C1_halfway_point, C2_vector,
+                bezier.start, bezier.C1);
 
-                bezier.C1 = C1_intersection;
+            bezier.C1 = C1_intersection;
 
-                subpath.upd_SVG_circle(C1_ui_el, bezier.C1);
-                subpath.upd_SVG_line(C1_line, bezier.start, bezier.C1);
+            subpath.upd_SVG_circle(C1_ui_el, bezier.C1);
+            subpath.upd_SVG_line(C1_line, bezier.start, bezier.C1);
 
-                let C2_halfway_point = point.div(point.add(bezier.tunni_point, bezier.end), 2)
-                let C1_vector = point.add(point.sub(bezier.C1, bezier.start), C2_halfway_point);
-                let C2_intersection = subpath.intersection(C2_halfway_point,
-                    C1_vector, bezier.end, bezier.C2);
+            let C2_halfway_point = point.div(point.add(bezier.tunni_point, bezier.end), 2)
+            let C1_vector = point.add(point.sub(bezier.C1, bezier.start), C2_halfway_point);
+            let C2_intersection = subpath.intersection(C2_halfway_point,
+                C1_vector, bezier.end, bezier.C2);
 
-                bezier.C2 = C2_intersection;
+            bezier.C2 = C2_intersection;
 
-                subpath.upd_SVG_circle(C2_ui_el, bezier.C2);
-                subpath.upd_SVG_line(C2_line, bezier.end, bezier.C2);
-                subpath.upd_SVG_line(tunni_line, bezier.C1, bezier.C2);
-            }
-            // update the position of the svg element
-            subpath.upd_SVG_circle(sel_el, e_point);
-            // update the path
-            subpath.update_path(upd_tunni, i, j);
+            subpath.upd_SVG_circle(C2_ui_el, bezier.C2);
+            subpath.upd_SVG_line(C2_line, bezier.end, bezier.C2);
+            subpath.upd_SVG_line(tunni_line, bezier.C1, bezier.C2);
         }
-
-
-    }
-
-    let HV_lock = (delta, delta_2, e_point, start) => {
-        if (Math.abs(delta.y) < Math.abs(delta.x)) {
-            if (Math.abs(delta_2.y) > Math.abs(delta.x)) {
-                // C1 point should be locked to vertical
-                e_point.x = start.x;
-                e_point.y = e_point.y;
-            } else {
-                // C1 point should remain locked to horizontal
-                console.log("2");
-                e_point.y = start.y;
-            }
-        } else if (Math.abs(delta.x) < Math.abs(delta.y)) { // if C1 point is locked to vertical
-            if (Math.abs(delta_2.x) > Math.abs(delta.y)) {
-                // C1 point should be locked to horizontal
-                e_point.y = start.y;
-                e_point.x = e_point.x;
-            } else {
-                // C1 point should remain locked to vertical
-                e_point.x = start.x;
-            }
-        }
-    }
-
-    /**
-     * Ends dragging the node, node is no longer selected
-     * @param {MouseEvent} e the mouse event
-     */
-    end_drag_node = (e) => {
-        if (sel_el && sel_el.node().tagName == "circle") {
-            sel_el.attr("r", "5px");
-            sel_el = false;
-        }
-    }
-
-    /**
-     * Starts dragging the tunni line
-     * @param {MouseEvent} e the mouse event
-     */
-    start_drag_line = (e) => {
-        if (sel_el && sel_el.node().tagName == "line") {
-            sel_el
-                .attr("stroke-width", "5px")
-                .attr("opacity", "1");
-        }
-    }
-
-    /**
-     * Drags the tunni line and scales the bezier handles accordingly
-     * @param {MouseEvent} e the mouse event
-     */
-    drag_line = (e) => {
-        let e_point = new point(e.x, e.y);
-        if (sel_el && sel_el.node().tagName == "line") {
-            let i = parseInt(sel_el.attr("spline_nr"));
-            let sp_nr = parseInt(sel_el.attr("subpath_nr"));
-            let subpath = pp.subpaths[sp_nr];
-            let bezier = subpath.splines[i];
-            let tl_vector = point.sub(point.add(e_point, bezier.C2), bezier.C1);
-            bezier.C1 = subpath.intersection(e, tl_vector, bezier.start, bezier.C1);
-            bezier.C2 = subpath.intersection(e, tl_vector, bezier.end, bezier.C2);
-            subpath.upd_SVG_circle(subpath.C1_ui_els[i], bezier.C1);
-            subpath.upd_SVG_line(subpath.C1_lines[i], bezier.start, bezier.C1);
-            subpath.upd_SVG_circle(subpath.C2_ui_els[i], bezier.C2);
-            subpath.upd_SVG_line(subpath.C2_lines[i], bezier.end, bezier.C2);
-            subpath.upd_SVG_line(subpath.tunni_lines[i], bezier.C1, bezier.C2);
-            subpath.update_path(true, i);
-        }
-    }
-
-    /**
-     * Ends the dragging of the Tunni Lines and resets the state of the system
-     * @param {MouseEvent} e mouseup-event
-     */
-    end_drag_line = (e) => {
-        if (sel_el && sel_el.node().tagName == "line") {
-            sel_el
-                .attr("stroke-width", "3px")
-                .attr("opacity", "0.5");
-            sel_el = false;
-        }
+        // update the position of the svg element
+        subpath.upd_SVG_circle(sel_el, e_point);
+        // update the path
+        subpath.update_path(upd_tunni, i, j);
     }
 
 
-    //================================================================================================//
-    // create instances
-    //================================================================================================//
+}
 
-
-
-    // add big instruction text before any points have been added
-    svg.append("text")
-        .attr("id", "instructions")
-        .attr("x", "50%")
-        .attr("y", "50%")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .attr("font-size", "5em")
-        .attr("fill", "lightgrey")
-        .attr("style", "user-select: none")
-        .text("Double-Click to add points!");
-
-
-    let pp = new polypath();
-    svg.on("dblclick", (e) => {
-        if (pp.subpaths.length > 0 && !pp.subpaths[pp.subpaths.length - 1].closed) {
-            pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
+let HV_lock = (delta, delta_2, e_point, start) => {
+    if (Math.abs(delta.y) < Math.abs(delta.x)) {
+        if (Math.abs(delta_2.y) > Math.abs(delta.x)) {
+            // C1 point should be locked to vertical
+            e_point.x = start.x;
+            e_point.y = e_point.y;
         } else {
-            svg.select("#instructions").remove();
-            pp.add_path(new path(pp, pp.subpaths.length));
-            pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
+            // C1 point should remain locked to horizontal
+            console.log("2");
+            e_point.y = start.y;
         }
-    });
-
-    let d3_body = d3.select("body");
-
-    let alt_pressed = false;
-
-    d3_body.on("keydown", (e) => {
-        if (String.fromCharCode(e.which) == " ") {
-            for (let subpath of pp.subpaths) {
-                subpath.ui.attr("opacity", 0);
-                pp.p.attr("fill", "black");
-            }
-        } else if (e.altKey) {
-            e.preventDefault();
-            alt_pressed = true;
+    } else if (Math.abs(delta.x) < Math.abs(delta.y)) { // if C1 point is locked to vertical
+        if (Math.abs(delta_2.x) > Math.abs(delta.y)) {
+            // C1 point should be locked to horizontal
+            e_point.y = start.y;
+            e_point.x = e_point.x;
+        } else {
+            // C1 point should remain locked to vertical
+            e_point.x = start.x;
         }
-    });
+    }
+}
 
-    d3_body.on("keyup", (e) => {
-        if (String.fromCharCode(e.which) == " ") {
-            for (let subpath of pp.subpaths) {
-                subpath.ui.attr("opacity", 1);
-                pp.p.attr("fill", "rgba(0, 0, 0, 0.125)");
-            }
-        } else if (e.altKey) {
-            alt_pressed = false;
+/**
+ * Ends dragging the node, node is no longer selected
+ * @param {MouseEvent} e the mouse event
+ */
+end_drag_node = (e) => {
+    if (sel_el && sel_el.node().tagName == "circle") {
+        sel_el.attr("r", "5px");
+        sel_el = false;
+    }
+}
+
+/**
+ * Starts dragging the tunni line
+ * @param {MouseEvent} e the mouse event
+ */
+start_drag_line = (e) => {
+    if (sel_el && sel_el.node().tagName == "line") {
+        sel_el
+            .attr("stroke-width", "5px")
+            .attr("opacity", "1");
+    }
+}
+
+/**
+ * Drags the tunni line and scales the bezier handles accordingly
+ * @param {MouseEvent} e the mouse event
+ */
+drag_line = (e) => {
+    let e_point = new point(e.x, e.y);
+    if (sel_el && sel_el.node().tagName == "line") {
+        let i = parseInt(sel_el.attr("spline_nr"));
+        let sp_nr = parseInt(sel_el.attr("subpath_nr"));
+        let subpath = pp.subpaths[sp_nr];
+        let bezier = subpath.splines[i];
+        let tl_vector = point.sub(point.add(e_point, bezier.C2), bezier.C1);
+        bezier.C1 = subpath.intersection(e, tl_vector, bezier.start, bezier.C1);
+        bezier.C2 = subpath.intersection(e, tl_vector, bezier.end, bezier.C2);
+        subpath.upd_SVG_circle(subpath.C1_ui_els[i], bezier.C1);
+        subpath.upd_SVG_line(subpath.C1_lines[i], bezier.start, bezier.C1);
+        subpath.upd_SVG_circle(subpath.C2_ui_els[i], bezier.C2);
+        subpath.upd_SVG_line(subpath.C2_lines[i], bezier.end, bezier.C2);
+        subpath.upd_SVG_line(subpath.tunni_lines[i], bezier.C1, bezier.C2);
+        subpath.update_path(true, i);
+    }
+}
+
+/**
+ * Ends the dragging of the Tunni Lines and resets the state of the system
+ * @param {MouseEvent} e mouseup-event
+ */
+end_drag_line = (e) => {
+    if (sel_el && sel_el.node().tagName == "line") {
+        sel_el
+            .attr("stroke-width", "3px")
+            .attr("opacity", "0.5");
+        sel_el = false;
+    }
+}
+
+
+//================================================================================================//
+// create instances
+//================================================================================================//
+
+
+
+// add big instruction text before any points have been added
+svg.append("text")
+    .attr("id", "instructions")
+    .attr("x", "50%")
+    .attr("y", "50%")
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "5em")
+    .attr("fill", "lightgrey")
+    .attr("style", "user-select: none")
+    .text("Double-Click to add points!");
+
+
+let pp = new polypath();
+svg.on("dblclick", (e) => {
+    if (pp.subpaths.length > 0 && !pp.subpaths[pp.subpaths.length - 1].closed) {
+        pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
+    } else {
+        svg.select("#instructions").remove();
+        pp.add_path(new path(pp, pp.subpaths.length));
+        pp.subpaths[pp.subpaths.length - 1].add_point(new point(e.x, e.y));
+    }
+});
+
+let d3_body = d3.select("body");
+
+let alt_pressed = false;
+
+d3_body.on("keydown", (e) => {
+    if (String.fromCharCode(e.which) == " ") {
+        for (let subpath of pp.subpaths) {
+            subpath.ui.attr("opacity", 0);
+            pp.p.attr("fill", "black");
         }
-    });
-
-    document.addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-        if (!svg.select(":focus").empty()) {
-            let el = svg.select(":focus");
-            let spline_nr = parseInt(el.attr("spline_nr"));
-            let subpath_nr = parseInt(el.attr("subpath_nr"));
-            let subpath = pp.subpaths[subpath_nr];
-            let bezier = subpath.splines[spline_nr];
-            if (el.attr("id") == "start") {
-                d3.select("#node_type").attr("style", "display: block");
-                d3.select("#lock").attr("style", "display: none");
-
-                d3.select("#corner_radio").property("checked", bezier.start_point_type == point_types.corner);
-                d3.select("#smooth_radio").property("checked", bezier.start_point_type == point_types.smooth);
-            } else if (el.attr("id") == "end") {
-                d3.select("#node_type").attr("style", "display: block");
-                d3.select("#lock").attr("style", "display: none");
-
-                d3.select("#corner_radio").property("checked", bezier.end_point_type == point_types.corner);
-                d3.select("#smooth_radio").property("checked", bezier.end_point_type == point_types.smooth);
-
-                d3.select("[name='curve_type']");
-            }
-            else if (el.attr("id") == "C1") {
-                d3.select("#lock").attr("style", "display: block");
-                if (bezier.is_start_hv_locked) {
-                    d3.select("#hv-lock").attr("style", "font-weight: bold");
-                } else {
-                    d3.select("#hv-lock").attr("style", "font-weight: normal");
-                }
-                d3.select("#hv-lock_checkbox").property("checked", bezier.is_start_hv_locked);
-                d3.select("#node_type").attr("style", "display: none");
-            } else if (el.attr("id") == "C2") {
-                d3.select("#lock").attr("style", "display: block");
-                if (bezier.is_end_hv_locked) {
-                    d3.select("#hv-lock").attr("style", "font-weight: bold");
-                } else {
-                    d3.select("#hv-lock").attr("style", "font-weight: normal");
-                }
-                d3.select("#hv-lock_checkbox").property("checked", bezier.is_end_hv_locked);
-                d3.select("#node_type").attr("style", "display: none");
-            }
-
-            var tooltip = document.getElementById('tooltip');
-            tooltip.className = 'visible';
-            tooltip.style.left = event.pageX + 20 + 'px';
-            tooltip.style.top = event.pageY - 20 + 'px';
-        }
-    });
-
-    let contextmenu = d3.select("#tooltip");
-
-    contextmenu.on("mousedown", (e) => {
+    } else if (e.altKey) {
         e.preventDefault();
-    });
+        alt_pressed = true;
+    }
+});
 
-    contextmenu.selectAll('[name="curve_type"]').on("change", (e) => {
-        e.preventDefault();
-        if (!svg.select(":focus").empty()) {
-            let el = svg.select(":focus");
-            let spline_nr = parseInt(el.attr("spline_nr"));
-            let subpath_nr = parseInt(el.attr("subpath_nr"));
-            let subpath = pp.subpaths[subpath_nr];
-            let bezier = subpath.splines[spline_nr];
-            if (el.attr("id") == "start") {
-                bezier.start_point_type = parseInt(e.target.value);
-            } else if (el.attr("id") == "end") {
-                bezier.end_point_type = parseInt(e.target.value);
-                console.log(e.target.value);
-            }
-            // subpath.update_path(true, spline_nr);
+d3_body.on("keyup", (e) => {
+    if (String.fromCharCode(e.which) == " ") {
+        for (let subpath of pp.subpaths) {
+            subpath.ui.attr("opacity", 1);
+            pp.p.attr("fill", "rgba(0, 0, 0, 0.125)");
         }
-    });
+    } else if (e.altKey) {
+        alt_pressed = false;
+    }
+});
 
-    contextmenu.select("#corner").on("mousedown", (e) => {
-        e.preventDefault();
-        if (!svg.select(":focus").empty()) {
-            console.log("corner");
-            set_point_type(point_types.corner);
-        }
-    });
-
-    contextmenu.select("#smooth").on("mousedown", (e) => {
-        e.preventDefault();
-        if (!svg.select(":focus").empty()) {
-            console.log("smooth");
-            set_point_type(point_types.smooth);
-        }
-    });
-
-    contextmenu.select("#hv-lock").on("mousedown", (e) => {
-        e.preventDefault();
-        if (!svg.select(":focus").empty()) {
-            let el = svg.select(":focus");
-            let spline_nr = parseInt(el.attr("spline_nr"));
-            let subpath_nr = parseInt(el.attr("subpath_nr"));
-            let subpath = pp.subpaths[subpath_nr];
-            let bezier = subpath.splines[spline_nr];
-            if (el.attr("id") == "start" || el.attr("id") == "C1") {
-                console.log("start");
-                bezier.is_start_hv_locked = !bezier.is_start_hv_locked;
-            } else if (el.attr("id") == "end" || el.attr("id") == "C2") {
-                console.log("end");
-                bezier.is_end_hv_locked = !bezier.is_end_hv_locked;
-            }
-            subpath.update_path(true, spline_nr);
-        }
-    });
-
-
-    document.addEventListener('click', (event) => {
-        const isTooltip = event.target === tooltip || tooltip.contains(event.target);
-        if (!isTooltip) {
-            tooltip.className = '';
-        }
-    });
-
-
-    function set_point_type(type) {
+document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+    if (!svg.select(":focus").empty()) {
         let el = svg.select(":focus");
-
+        let spline_nr = parseInt(el.attr("spline_nr"));
         let subpath_nr = parseInt(el.attr("subpath_nr"));
         let subpath = pp.subpaths[subpath_nr];
-
-        let spline_nr = parseInt(el.attr("spline_nr"));
         let bezier = subpath.splines[spline_nr];
-
         if (el.attr("id") == "start") {
-            bezier.start_point_type = type;
-            if (subpath.closed) {
-                next_bezier = subpath.splines[subpath.splines.length - 1];
-                next_bezier.end_point_type = type;
-            }
+            d3.select("#node_type").attr("style", "display: block");
+            d3.select("#lock").attr("style", "display: none");
+
+            d3.select("#corner_radio").property("checked", bezier.start_point_type == point_types.corner);
+            d3.select("#smooth_radio").property("checked", bezier.start_point_type == point_types.smooth);
         } else if (el.attr("id") == "end") {
-            bezier.end_point_type = type;
-            if (spline_nr < subpath.splines.length - 1) {
-                next_bezier = subpath.splines[spline_nr + 1];
-                next_bezier.start_point_type = type;
+            d3.select("#node_type").attr("style", "display: block");
+            d3.select("#lock").attr("style", "display: none");
+
+            d3.select("#corner_radio").property("checked", bezier.end_point_type == point_types.corner);
+            d3.select("#smooth_radio").property("checked", bezier.end_point_type == point_types.smooth);
+
+            d3.select("[name='curve_type']");
+        }
+        else if (el.attr("id") == "C1") {
+            d3.select("#lock").attr("style", "display: block");
+            if (bezier.is_start_hv_locked) {
+                d3.select("#hv-lock").attr("style", "font-weight: bold");
+            } else {
+                d3.select("#hv-lock").attr("style", "font-weight: normal");
             }
+            d3.select("#hv-lock_checkbox").property("checked", bezier.is_start_hv_locked);
+            d3.select("#node_type").attr("style", "display: none");
+        } else if (el.attr("id") == "C2") {
+            d3.select("#lock").attr("style", "display: block");
+            if (bezier.is_end_hv_locked) {
+                d3.select("#hv-lock").attr("style", "font-weight: bold");
+            } else {
+                d3.select("#hv-lock").attr("style", "font-weight: normal");
+            }
+            d3.select("#hv-lock_checkbox").property("checked", bezier.is_end_hv_locked);
+            d3.select("#node_type").attr("style", "display: none");
+        }
+
+        var tooltip = document.getElementById('tooltip');
+        tooltip.className = 'visible';
+        tooltip.style.left = event.pageX + 20 + 'px';
+        tooltip.style.top = event.pageY - 20 + 'px';
+    }
+});
+
+let contextmenu = d3.select("#tooltip");
+
+contextmenu.on("mousedown", (e) => {
+    e.preventDefault();
+});
+
+contextmenu.selectAll('[name="curve_type"]').on("change", (e) => {
+    e.preventDefault();
+    if (!svg.select(":focus").empty()) {
+        let el = svg.select(":focus");
+        let spline_nr = parseInt(el.attr("spline_nr"));
+        let subpath_nr = parseInt(el.attr("subpath_nr"));
+        let subpath = pp.subpaths[subpath_nr];
+        let bezier = subpath.splines[spline_nr];
+        if (el.attr("id") == "start") {
+            bezier.start_point_type = parseInt(e.target.value);
+        } else if (el.attr("id") == "end") {
+            bezier.end_point_type = parseInt(e.target.value);
+            console.log(e.target.value);
+        }
+        // subpath.update_path(true, spline_nr);
+    }
+});
+
+contextmenu.select("#corner").on("mousedown", (e) => {
+    e.preventDefault();
+    if (!svg.select(":focus").empty()) {
+        console.log("corner");
+        set_point_type(point_types.corner);
+    }
+});
+
+contextmenu.select("#smooth").on("mousedown", (e) => {
+    e.preventDefault();
+    if (!svg.select(":focus").empty()) {
+        console.log("smooth");
+        set_point_type(point_types.smooth);
+    }
+});
+
+contextmenu.select("#hv-lock").on("mousedown", (e) => {
+    e.preventDefault();
+    if (!svg.select(":focus").empty()) {
+        let el = svg.select(":focus");
+        let spline_nr = parseInt(el.attr("spline_nr"));
+        let subpath_nr = parseInt(el.attr("subpath_nr"));
+        let subpath = pp.subpaths[subpath_nr];
+        let bezier = subpath.splines[spline_nr];
+        if (el.attr("id") == "start" || el.attr("id") == "C1") {
+            console.log("start");
+            bezier.is_start_hv_locked = !bezier.is_start_hv_locked;
+        } else if (el.attr("id") == "end" || el.attr("id") == "C2") {
+            console.log("end");
+            bezier.is_end_hv_locked = !bezier.is_end_hv_locked;
+        }
+        subpath.update_path(true, spline_nr);
+    }
+});
+
+
+document.addEventListener('click', (event) => {
+    const isTooltip = event.target === tooltip || tooltip.contains(event.target);
+    if (!isTooltip) {
+        tooltip.className = '';
+    }
+});
+
+
+function set_point_type(type) {
+    let el = svg.select(":focus");
+
+    let subpath_nr = parseInt(el.attr("subpath_nr"));
+    let subpath = pp.subpaths[subpath_nr];
+
+    let spline_nr = parseInt(el.attr("spline_nr"));
+    let bezier = subpath.splines[spline_nr];
+
+    if (el.attr("id") == "start") {
+        bezier.start_point_type = type;
+        if (subpath.closed) {
+            next_bezier = subpath.splines[subpath.splines.length - 1];
+            next_bezier.end_point_type = type;
+        }
+    } else if (el.attr("id") == "end") {
+        bezier.end_point_type = type;
+        if (spline_nr < subpath.splines.length - 1) {
+            next_bezier = subpath.splines[spline_nr + 1];
+            next_bezier.start_point_type = type;
         }
     }
+}
 

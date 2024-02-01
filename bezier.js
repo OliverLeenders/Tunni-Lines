@@ -89,8 +89,20 @@ class point {
         return p2;
     }
 
+    /**
+     * Creates a string representation of the point
+     * @returns {String} string
+     */
     to_string() {
         return this.x + " " + this.y;
+    }
+
+    /**
+     * Creates a clone of the point
+     * @returns {point} clone
+     */
+    clone() {
+        return new point(this.x, this.y);
     }
 }
 
@@ -159,6 +171,14 @@ class bezier {
             + this.C2.to_string() + ", "
             + this.end.to_string();
     }
+
+    /**
+     * Creates a clone of the bezier spline
+     * @returns {bezier} clone
+     */
+    clone() {
+        return new bezier(this.start.clone(), this.C1.clone(), this.C2.clone(), this.end.clone());
+    }
 }
 /**
  * Class representing polypath
@@ -185,6 +205,14 @@ class polypath {
             str += " " + subpath.spline_string();
         }
         return str;
+    }
+
+    clone() {
+        let clone = new polypath();
+        for (let subpath of this.subpaths) {
+            clone.add_path(subpath.clone(clone));
+        }
+        return clone;
     }
 
 
