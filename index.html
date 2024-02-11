@@ -6,18 +6,14 @@
 
     <title>Tunni Lines</title>
     <!-- The d3 library is used to manipulate the svg. -->
-    <script src="d3.js" charset="utf-8"></script>
+    <script src="js/d3.js" charset="utf-8"></script>
     <!-- The index.css file contains some styling for the page and the svg. -->
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
     <!-- The svg populated and modified solely using javascript. -->
     <svg>
-        <linearGradient id="grad">
-            <stop offset="0%" stop-color="#aaaaaa" />
-            <stop offset="100%" stop-color="#000000" />
-        </linearGradient>
     </svg>
     <div id="tooltip">
         <div id="tooltip-text">
@@ -34,22 +30,29 @@
             <div id="lock">
                 <div id="hv-lock">
                     <input type="checkbox" name="hv-lock" id="hv-lock_checkbox" value="0">
-                    <label id="hv-lock_text">HV-Lock</label>
+                    <label id="hv-lock_text" for="hv-lock_checkbox">HV-Lock</label>
                 </div>
             </div>
         </div>
     </div>
 </body>
 <!-- Footer containing usage info and creditations. -->
-<footer style="height: 50px; font-size: 12px;">
-    <b>Double-Click to add new point. Double-Click again to define a cubic bezier spline. Press
-        Space to preview the spline and hide the control points.
-    </b>
-    <br>
-    The Tunni lines concept was devised by Eduardo Tunni
-    and Fontlab Ltd., and is used in the FontLab font editor.
+<footer>
+    <div class="footer">
+        <b>Double-Click to add new point. Double-Click again to define a cubic bezier spline. Press
+            Space to preview the spline and hide the control points.
+        </b>
+        <br>
+        The Tunni lines concept was devised by Eduardo Tunni
+        and Fontlab Ltd., and is used in the FontLab font editor.
+    </div>
 </footer>
-<script src="bezier.js" charset="utf-8"></script>
-<script src="index.js" charset="utf-8"></script>
+<script src="js/point.js" charset="utf-8"></script>
+<script src="js/geometry.util.js" charset="utf-8"></script>
+<script src="js/bezier.js" charset="utf-8"></script>
+<script src="js/path.js" charset="utf-8"></script>
+<script src="js/polypath.js" charset="utf-8"></script>
+<script src="js/undo_history.js" charset="utf-8"></script>
+<script src="js/index.js" charset="utf-8"></script>
 
 </html>
