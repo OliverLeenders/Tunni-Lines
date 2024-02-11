@@ -116,6 +116,6 @@ its corresponding anchor during scaling. When this happens, the dragging should 
 
 ## Roadmap
 
-* Undo/Redo
+* ~~Undo/Redo~~ (done)
 * Download SVG
 * (if I have a lot of time: snapping)
