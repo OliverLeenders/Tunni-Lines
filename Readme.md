@@ -8,14 +8,19 @@ Many thanks go to Adam Twardoch and the people at FontLab who kindly gave permis
 repository.
 
 ### Interactive Demo
+You can find an implementation of a small Bezier-curve editor using Tunni-lines here:
 
 https://oliverleenders.github.io/Tunni-Lines/
 
 <img src="img/tunni1.png" height="200">
 <img src="img/tunni2.png" height="200">
 
+You can drag the Tunni-point to rescale and fine-tune the two control points of a qubic Bezier spline.
+
 <img src="img/contextmenu1.png" height="200">
 <img src="img/contextmenu2.png" height="200">
+
+In the demo Bezier curve editor, right-clicking on a control point gives you the option of locking it to the horizontal or vertical axes. Right-clicking on a contour point allows you to set whether this point should be smooth or a corner.
 
 ## Motivation
 
