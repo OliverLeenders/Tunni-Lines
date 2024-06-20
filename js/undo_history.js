@@ -64,6 +64,10 @@ class undo_history {
         return pp.clone();
     }
 
+    /**
+     * Returns the current history
+     * @returns polypath[] the current history
+     */
     getHistory() {
         return this.history;
     }

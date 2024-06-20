@@ -344,8 +344,6 @@ function end_drag_line(e) {
 // create instances
 //================================================================================================//
 
-
-
 // add big instruction text before any points have been added
 svg.append("text")
     .attr("id", "instructions")
@@ -361,14 +359,21 @@ svg.append("text")
 let _history = new undo_history();
 let pp = new polypath();
 _history.push(pp);
+
+
+
 svg.on("dblclick", (e) => {
-    // _history.log_state();
-    if (pp.subpaths.length > 0 && !pp.subpaths[pp.subpaths.length - 1].closed) {
-        pp.subpaths[pp.subpaths.length - 1].add_point(get_event_svg_coords(e));
-    } else {
-        svg.select("#instructions").remove();
-        pp.add_path(new path(pp, pp.subpaths.length));
-        pp.subpaths[pp.subpaths.length - 1].add_point(get_event_svg_coords(e));
+    // check if event origin was circle with id "start"
+    let was_start = e.target.id == "start";
+    _history.log_state(extensive = true);
+    if (!was_start) {
+        if (pp.subpaths.length > 0 && !pp.subpaths[pp.subpaths.length - 1].closed) {
+            pp.subpaths[pp.subpaths.length - 1].add_point(get_event_svg_coords(e));
+        } else {
+            svg.select("#instructions").remove();
+            pp.add_path(new path(pp, pp.subpaths.length));
+            pp.subpaths[pp.subpaths.length - 1].add_point(get_event_svg_coords(e));
+        }
     }
     _history.push(pp);
 });

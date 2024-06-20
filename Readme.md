@@ -15,12 +15,15 @@ https://oliverleenders.github.io/Tunni-Lines/
 <img src="img/tunni1.png" height="200">
 <img src="img/tunni2.png" height="200">
 
-You can drag the Tunni-point to rescale and fine-tune the two control points of a qubic Bezier spline.
+You can drag the Tunni-point to rescale and fine-tune the two control points of a qubic Bezier
+spline.
 
 <img src="img/contextmenu1.png" height="200">
 <img src="img/contextmenu2.png" height="200">
 
-In the demo Bezier curve editor, right-clicking on a control point gives you the option of locking it to the horizontal or vertical axes. Right-clicking on a contour point allows you to set whether this point should be smooth or a corner.
+In the demo Bezier curve editor, right-clicking on a control point gives you the option of locking
+it to the horizontal or vertical axes. Right-clicking on a contour point allows you to set whether
+this point should be smooth or a corner.
 
 ## Motivation
 
@@ -71,7 +74,8 @@ follows:
     $$h_x'(b) = h_x(b) + c_x^{(1)} - a_x, \qquad h_y'(b) = h_y(b) + c_y^{(1)} - a_y$$
 
 5. Compute the intersection between the line $\overline{h(a)h'(a)}$ and the line $\overline{ac^{(1)}}$
-    ($\overline{h(b)h'(b)}$ and $\overline{bc^{(2)}}$ respectively) and use the resulting points as new coordinates for $c^{(1)}$ (or $c^{(2)}$).
+    ($\overline{h(b)h'(b)}$ and $\overline{bc^{(2)}}$ respectively) and use the resulting points as
+    new coordinates for $c^{(1)}$ (or $c^{(2)}$).
 
 ### Update of the Handles Given Tunni Line and Handle Direction
 
@@ -121,6 +125,6 @@ its corresponding anchor during scaling. When this happens, the dragging should 
 
 ## Roadmap
 
-* ~~Undo/Redo~~ (done)
+* Undo/Redo (still buggy -- only works for one closed path)
 * Download SVG
 * (if I have a lot of time: snapping)

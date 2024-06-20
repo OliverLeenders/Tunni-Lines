@@ -46,7 +46,7 @@ class polypath {
             // subpath.clear_ui();
             console.log("adding ui");
             subpath.clear_ui();
-            subpath.add_ui();
+            subpath.add_ui(true);
             subpath.update_path(true, 0);
         }
     }

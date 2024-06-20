@@ -56,21 +56,21 @@ class path {
         this.closed = true;
     }
 
-    add_ui() {
+    add_ui(redraw=false) {
         this.add_start_ui();
         for (let i = 0; i < this.splines.length; i++) {
-            this.add_ui_control(i);
+            this.add_ui_control(i, redraw);
         }
         this.has_ui = true;
     }
 
-    
+
 
     /**
      * Add ui control points for a given spline
      * @param {Number} i spline number
      */
-    add_ui_control(i) {
+    add_ui_control(i, redraw=false) {
         let curr = this.splines[i];
         this.is_ui_els.push(this.is_group.append("circle")
             .attr("cx", curr.is_point.x + "px")
@@ -134,7 +134,7 @@ class path {
             .attr("id", "C2")
             .attr("tabindex", "0"));
 
-        if (!this.closed) {
+        if (!this.closed || redraw) {
             this.end_ui_els.push(this.end_group.append("circle")
                 .attr("cx", curr.end.x + "px")
                 .attr("cy", curr.end.y + "px")
@@ -143,7 +143,13 @@ class path {
                 .attr("fill", "steelblue")
                 .attr("r", "5px")
                 .attr("id", "end")
-                .attr("tabindex", "0"));
+                .attr("tabindex", "0").on("dblclick", (e) => {
+                    // stop event propagation -> new point cannot be created on top of an existing
+                    // point
+                    e.cancelBubble = true;
+                }));
+        } else {
+            console.log("Path was closed")
         }
         // tunni point
         this.tunni_ui_els.push(this.tunni_group.append("circle")
@@ -173,7 +179,6 @@ class path {
             .attr("id", "start")
             .attr("tabindex", "0");
         this.start_ui_el.on("dblclick", (e) => {
-            e.cancelBubble = true;
             this.add_point(this.start);
         })
     }
@@ -297,7 +302,7 @@ class path {
         console.log(avg);
         // when both start and end points have same coordinates, avg is NaN
         // the programm behaves insensibly in this case.
-        if (avg !== avg) {
+        if (avg !== avg && avg !== Infinity && avg !== -Infinity) {
             return;
         }
         bezier.C1 = point.add(bezier.start, point.mult(point.sub(is, bezier.start), avg));
