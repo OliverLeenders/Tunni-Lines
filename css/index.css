@@ -96,6 +96,10 @@ circle#is {
     r: 2px;
 }
 
+circle#tunni {
+    fill: rgb(136, 185, 224);
+}
+
 #tooltip {
     position: absolute;
     background-color: white;

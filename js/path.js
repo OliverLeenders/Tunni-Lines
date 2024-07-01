@@ -26,7 +26,8 @@ class path {
         this.tunni_ui_els = [];
 
         if (append) {
-            this.ui = svg.append("g").attr("id", "ui");
+            this.ui = svg.append("g").attr("id", "ui")
+                .attr("path_nr", this.index);
             this.is_group = this.ui.append("g").attr("id", "is");
             this.tunni_line_group = this.ui.append("g").attr("id", "tunni_line");
             this.C1_line_group = this.ui.append("g").attr("id", "C1_lines");
@@ -37,7 +38,7 @@ class path {
             this.end_group = this.ui.append("g").attr("id", "end");
             this.tunni_group = this.ui.append("g").attr("id", "tunni");
         } else {
-            this.ui = d3.select("#ui");
+            this.ui = d3.select("#ui[path_nr='"+ this.index +"']");
             this.is_group = d3.select("#is");
             this.tunni_line_group = d3.select("#tunni_line");
             this.C1_line_group = d3.select("#C1_lines");
@@ -190,9 +191,11 @@ class path {
      * @param {number} j number of secondary spline to update (because of smooth enabled splines)
      */
     update_path(update_tunni, i, j = i) {
+        // if the path is empty, return
         if (this.splines.length == 0) {
             return;
         }
+        // if a neighboring spline should be updated, do that
         if (j != i) {
             this.update_path(update_tunni, j);
         }
@@ -365,7 +368,7 @@ class path {
 
     clear_ui() {
         svg.selectAll("svg > path").attr("d", "");
-        svg.selectAll("svg > #ui > g > *").remove();
+        svg.selectAll("svg > #ui[path_nr='"+ this.index + "'] > g > *").remove();
         this.start_ui_el = undefined;
         this.end_ui_els = [];
         this.tunni_ui_els = [];
