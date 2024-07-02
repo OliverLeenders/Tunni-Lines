@@ -191,6 +191,7 @@ class path {
      * @param {number} j number of secondary spline to update (because of smooth enabled splines)
      */
     update_path(update_tunni, i, j = i) {
+        console.log("splines.length: " + this.splines.length)
         // if the path is empty, return
         if (this.splines.length == 0) {
             return;
@@ -199,6 +200,8 @@ class path {
         if (j != i) {
             this.update_path(update_tunni, j);
         }
+        console.log("HEYYY")
+        console.log(this.parent.to_string());
         this.parent.p.attr("d", this.parent.to_string());
         // update tunni point
         let bezier = this.splines[i];
@@ -367,7 +370,6 @@ class path {
     }
 
     clear_ui() {
-        svg.selectAll("svg > path").attr("d", "");
         svg.selectAll("svg > #ui[path_nr='"+ this.index + "'] > g > *").remove();
         this.start_ui_el = undefined;
         this.end_ui_els = [];

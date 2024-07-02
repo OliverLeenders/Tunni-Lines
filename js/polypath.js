@@ -40,14 +40,17 @@ class polypath {
 
     redraw_polypath(add_new_ui = false) {
         svg.selectAll("svg > path").attr("d", "");
-        svg.selectAll("svg > #ui > g > *").remove();
         // redraw
-        for (let subpath of pp.subpaths) {
+        for (let i = 0; i < this.subpaths.length; i++) {
+            let subpath = this.subpaths[i];
             // subpath.clear_ui();
+
             console.log("adding ui");
             subpath.clear_ui();
             subpath.add_ui(true);
-            subpath.update_path(true, 0);
+            if (subpath.splines.length > 0) {
+                subpath.update_path(true, (i + 1) % this.subpaths.length);
+            }
         }
     }
 }
