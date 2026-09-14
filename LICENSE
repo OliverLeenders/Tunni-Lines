@@ -1,14 +1,15 @@
 THE CODE IS LICENSED UNDER A *MODIFIED* GPL v3 License.
 The modifications applied are stated above the GPL.
 
-* Commercial use, in any form whatsoever, MUST be cleared by the
-  people at FontLab LTD.
-* Re-Distribution, in any form whatsoever (such as publishing this on a webpage)
-  MUST be cleared by the people at FontLab LTD.
-* If you remove the Tunni-Lines Feature from the code, the software becomes
-  subject to the GPL v3 without any of the above restrictions, as the Tunni
-  Lines Feature is the reason I cannot legally safe give permission to commercialize
-  or redistribute the project as is.
+* Any redistribution of the Tunni-Line feature along with the tunni point
+  must always contain an attribution to Mr. Eduardo Tunni and the FontLab
+  font editor. The required form is the following; "The Tunni lines
+  concept was devised by Eduardo Tunni and Fontlab Ltd., and is used in
+  the FontLab font editor."
+* Redistribution without attribution is prohibited.
+* Commercial use of the tunni line feature must be cleared by the people
+  at FontLab.
+* The rest of this repository falls under the GPL v3.
 
 The text of the GPL remains unmodified, however in the case
 of any contradiction between the above and the below, the above

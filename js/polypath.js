@@ -48,8 +48,9 @@ class polypath {
             console.log("adding ui");
             subpath.clear_ui();
             subpath.add_ui(true);
+            console.log("UPDATING PATH ---")
             if (subpath.splines.length > 0) {
-                subpath.update_path(true, (i + 1) % this.subpaths.length);
+                subpath.update_path(true, i);
             }
         }
     }

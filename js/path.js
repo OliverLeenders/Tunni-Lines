@@ -38,7 +38,7 @@ class path {
             this.end_group = this.ui.append("g").attr("id", "end");
             this.tunni_group = this.ui.append("g").attr("id", "tunni");
         } else {
-            this.ui = d3.select("#ui[path_nr='"+ this.index +"']");
+            this.ui = d3.select("#ui[path_nr='" + this.index + "']");
             this.is_group = d3.select("#is");
             this.tunni_line_group = d3.select("#tunni_line");
             this.C1_line_group = d3.select("#C1_lines");
@@ -57,7 +57,7 @@ class path {
         this.closed = true;
     }
 
-    add_ui(redraw=false) {
+    add_ui(redraw = false) {
         this.add_start_ui();
         for (let i = 0; i < this.splines.length; i++) {
             this.add_ui_control(i, redraw);
@@ -71,7 +71,7 @@ class path {
      * Add ui control points for a given spline
      * @param {Number} i spline number
      */
-    add_ui_control(i, redraw=false) {
+    add_ui_control(i, redraw = false) {
         let curr = this.splines[i];
         this.is_ui_els.push(this.is_group.append("circle")
             .attr("cx", curr.is_point.x + "px")
@@ -191,7 +191,6 @@ class path {
      * @param {number} j number of secondary spline to update (because of smooth enabled splines)
      */
     update_path(update_tunni, i, j = i) {
-        console.log("splines.length: " + this.splines.length)
         // if the path is empty, return
         if (this.splines.length == 0) {
             return;
@@ -200,8 +199,6 @@ class path {
         if (j != i) {
             this.update_path(update_tunni, j);
         }
-        console.log("HEYYY")
-        console.log(this.parent.to_string());
         this.parent.p.attr("d", this.parent.to_string());
         // update tunni point
         let bezier = this.splines[i];
@@ -212,6 +209,12 @@ class path {
             next_bezier = this.splines[i + 1];
             next_is = geometry.intersection(next_bezier.start, next_bezier.C1, next_bezier.C2, next_bezier.end);
         }
+
+        // check if control points are positioned correctly; i.e.:
+        //      1.  both control points need to be on the same side of the line between start and
+        //          end points
+        //      2.  the control handles need to point toward one another; i.e. the intersection
+        //          point of the handles needs to be on the same side as the handles
 
         if (geometry.same_side(bezier.start, bezier.end, bezier.C1, bezier.C2)) {
             if (geometry.same_side(bezier.start, bezier.end, bezier.C1, is)) {
@@ -245,11 +248,22 @@ class path {
             }
         }
 
+        this.check_tunni_line(i);
+    }
+
+    check_tunni_line(i) {
+        let bezier = this.splines[i];
         if (geometry.distance_line_to_point(bezier.start, bezier.end, bezier.C1) < 7
             && geometry.distance_line_to_point(bezier.start, bezier.end, bezier.C2) < 7) {
             this.tunni_lines[i].attr("style", "display: none");
         } else {
             this.tunni_lines[i].attr("style", "display: inline");
+        }
+    }
+
+    check_tunni_lines() {
+        for (let i = 0; i < this.splines.length; i++) {
+            this.check_tunni_line(i);
         }
     }
 
@@ -370,7 +384,7 @@ class path {
     }
 
     clear_ui() {
-        svg.selectAll("svg > #ui[path_nr='"+ this.index + "'] > g > *").remove();
+        svg.selectAll("svg > #ui[path_nr='" + this.index + "'] > g > *").remove();
         this.start_ui_el = undefined;
         this.end_ui_els = [];
         this.tunni_ui_els = [];

@@ -308,11 +308,9 @@ function start_drag_line(e) {
 function drag_line(e) {
     let e_point = get_event_svg_coords(e);
     if (sel_el && sel_el.node().tagName == "line") {
-        console.log(e_point.to_string());
         let i = parseInt(sel_el.attr("spline_nr"));
         let sp_nr = parseInt(sel_el.attr("subpath_nr"));
         let subpath = pp.subpaths[sp_nr];
-        console.log(subpath);
         let bezier = subpath.splines[i];
         let tl_vector = point.sub(point.add(e_point, bezier.C2), bezier.C1);
         bezier.C1 = geometry.intersection(e_point, tl_vector, bezier.start, bezier.C1);
@@ -365,7 +363,6 @@ _history.push(pp);
 svg.on("dblclick", (e) => {
     // check if event origin was circle with id "start"
     let was_start = e.target.id == "start";
-    _history.log_state(extensive = true);
     if (!was_start) {
         if (pp.subpaths.length > 0 && !pp.subpaths[pp.subpaths.length - 1].closed) {
             pp.subpaths[pp.subpaths.length - 1].add_point(get_event_svg_coords(e));
